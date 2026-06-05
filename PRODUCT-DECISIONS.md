@@ -1,4 +1,4 @@
-# VOYAGR — Product Decision Log
+# Roam Wyld — Product Decision Log
 
 A record of the significant product decisions made during the build: what was chosen, what was rejected, and why. This is the document that shows how a PM thinks, not just what they shipped.
 
@@ -38,7 +38,7 @@ A record of the significant product decisions made during the build: what was ch
 ### Outlook Import: Deferred to v1.1
 **Decision:** Gmail only at launch.
 **Rejected:** Build both Gmail and Outlook OAuth for launch.
-**Why:** Gmail covers ~35% of email users; the VOYAGR target persona (self-planned, leisure travel, 30-55) skews heavily Gmail. Outlook adds a second OAuth surface, a second API integration, and targets a different (enterprise) demographic. The incremental coverage doesn't justify the Phase 2 time — and beta feedback will confirm whether demand warrants v1.1 priority.
+**Why:** Gmail covers ~35% of email users; the Roam Wyld target persona (self-planned, leisure travel, 30-55) skews heavily Gmail. Outlook adds a second OAuth surface, a second API integration, and targets a different (enterprise) demographic. The incremental coverage doesn't justify the Phase 2 time — and beta feedback will confirm whether demand warrants v1.1 priority.
 
 ### PDF Upload: Deferred to v1.1
 **Decision:** Email import + manual entry covers launch.
@@ -70,7 +70,7 @@ A record of the significant product decisions made during the build: what was ch
 
 ### Weather and Packing List: Cut to v1.1
 **Decision:** Both features moved out of Phase 4 per CPO demo panel recommendation.
-**Why:** Neither is a moat. Native iOS weather is good enough; Apple Weather ships on every iPhone. AI packing lists exist in multiple free apps. Neither feature would prevent a user from choosing VOYAGR over a competitor. Time in Phase 4 is better spent on group mode, emergency info, and language basics — features with no free native alternative.
+**Why:** Neither is a moat. Native iOS weather is good enough; Apple Weather ships on every iPhone. AI packing lists exist in multiple free apps. Neither feature would prevent a user from choosing Roam Wyld over a competitor. Time in Phase 4 is better spent on group mode, emergency info, and language basics — features with no free native alternative.
 
 ### Group Mode: 3-Day Timebox in Phase 4
 **Decision:** Group mode ships in Phase 4 with a strict 3-day development window.
