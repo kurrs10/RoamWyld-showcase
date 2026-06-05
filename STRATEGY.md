@@ -1,6 +1,6 @@
-# VOYAGR — Product Strategy
+# Roam Wyld — Product Strategy
 
-A summary of the competitive positioning, monetization model, and key strategic decisions behind VOYAGR.
+A summary of the competitive positioning, monetization model, and key strategic decisions behind Roam Wyld.
 
 ---
 
@@ -18,7 +18,7 @@ Individually, partial versions exist — Rome2Rio for routing, Sherpa for visa i
 
 ## Competitive Positioning
 
-| Feature | TripIt Pro | Wanderlog Plus | Any AI Itinerary App | VOYAGR |
+| Feature | TripIt Pro | Wanderlog Plus | Any AI Itinerary App | Roam Wyld |
 |---------|-----------|---------------|---------------------|--------|
 | Booking validation | None | None | None | Yes |
 | Per-passport entry requirements | None | None | None | Yes |
@@ -64,7 +64,7 @@ Booking validation, entry requirements, emergency info, the core trip timeline, 
 ## Key Prioritization Decisions
 
 **Never Cut (non-negotiable for v1):**
-Offline caching, transit directions, per-passport entry requirements, booking validation. These are VOYAGR's reason to exist. Everything else can slip.
+Offline caching, transit directions, per-passport entry requirements, booking validation. These are Roam Wyld's reason to exist. Everything else can slip.
 
 **Cut to v1.1:**
 Weather, packing list, expense splitting, visa tracker, Outlook import, PDF upload. All valuable — none are moats. Native alternatives exist for weather; email import covers the booking import case; expense splitting has Splitwise.
