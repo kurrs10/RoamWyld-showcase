@@ -1,6 +1,6 @@
-# VOYAGR — Architecture Overview
+# Roam Wyld — Architecture Overview
 
-High-level technical architecture for VOYAGR. Written for product and engineering audiences — no implementation code.
+High-level technical architecture for Roam Wyld. Written for product and engineering audiences — no implementation code.
 
 ---
 
