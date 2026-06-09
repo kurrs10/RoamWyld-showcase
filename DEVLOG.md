@@ -6,6 +6,76 @@ Built by Kirsten Evans (Product Manager) using Claude Code.
 
 ---
 
+## Phase 5 — Session 1: Security, Analytics, Gmail Revocation, Beta Access (June 9, 2026)
+**Session date:** June 9, 2026 (21 days to deadline)
+**Goal:** Ship everything that doesn't require Kirsten — pure code Phase 5 items in parallel
+
+### What Was Built
+
+- **Gmail revocation UI** — `isGmailConnected()` + `revokeGmailToken()` added to `gmailImport.ts`. `revokeGmailToken` POSTs to `https://oauth2.googleapis.com/revoke`, treats 400 as success (already-invalid token), then clears local SecureStore. `ProfileScreen.tsx` gets a "Disconnect Gmail" button (only visible when connected), confirmation alert, loading state ("Disconnecting..."), and success/error feedback. Satisfies App Store Guideline 5.1.1 — hard submission blocker cleared.
+
+- **Server-side rate limiting on transit-directions** — `supabase/migrations/008_transit_rate_limit.sql` creates `transit_rl(user_id, window_start, call_count)` with RLS. Edge function gets a service-role client check via `upsert_transit_rl` Postgres function (atomic INSERT ... ON CONFLICT DO UPDATE to avoid check-then-act race). Cap: 10 calls/hour/user → 429 with friendly message. Client-side: 429 response serves stale cache if available rather than showing an error — consistent with H-4 offline fallback pattern. Client-side 3-min cooldown kept as defense in depth.
+
+- **PostHog instrumentation — all 7 Phase 4 events wired:**
+  - `trackAffiliateTapped` → InsuranceScreen (SafetyWing, iVisa, credit card) + CurrencyScreen (Wise)
+  - `trackExchangeRateFetch` → CurrencyScreen on live fetch and cache-hit paths
+  - `trackInsurancePolicyAdded` → InsuranceScreen save handler (travel + credit card paths)
+  - `trackCurrencyConverterUsed` → CurrencyScreen on amount input change + swap button
+  - `trackEmergencyNumberTapped` → EmergencyScreen tap-to-call (embassy `numberType` bug fixed too)
+  - `trackTodayScreenLoad` — already wired (pre-existing)
+  - `trackLanguagePhrasesExpanded` — already wired (pre-existing)
+
+- **Wise promo link wired in CurrencyScreen** — "Send money abroad with Wise" `TouchableOpacity` added below converter card, calls `getWiseLink(toCode)` + `trackAffiliateTapped`.
+
+- **iVisa promo link wired in InsuranceScreen** — "Need a visa?" block added after SafetyWing promo, calls `getIVisaLink()` + `trackAffiliateTapped`.
+
+- **Beta access system** — confirmed `003_beta_access.sql` already exists with full schema (`user_id`, `granted_by`, `granted_at`, `expires_at`, `notes`, RLS). `useProAccess.ts` already queries it and ORs with RevenueCat. `009_beta_access.sql` created as documented no-op. Admin workflow: insert rows into `beta_access` via Supabase Dashboard.
+
+- **Day-10 trial activation prompt** — added to `TodayScreen.tsx`. Shows amber banner when: user is in trial, account age ≥ 10 days AND < 14 days, zero trips, not yet dismissed. Reads `session.user.created_at` as proxy for trial start. Persists dismissal to AsyncStorage (`trialPromptDismissed`). "Create a Trip" navigates to Trip tab; "Dismiss" hides banner permanently.
+
+- **Viral invite loop** — product owner spec completed (full Discover→Analyze→Resolve→Validate, all states, edge cases, copy, analytics events). Build starts next session. Key decisions documented below.
+
+### Key Decisions
+
+| Decision | Rationale |
+|---|---|
+| Service-role client for rate limiting | Anon client JWT can only see own `transit_rl` row; service-role needed for atomic upsert from edge function — server-side rate limiting is not bypassable via user JWT |
+| Serve stale cache on 429 | Rate-limited user mid-trip still sees their directions rather than an error screen — same principle as H-4 network fallback |
+| Atomic Postgres function for rate limit upsert | Eliminates check-then-act race condition that would exist with separate SELECT + UPDATE calls |
+| beta_access already existed in 003 | No rebuild needed; `useProAccess` already implements the OR logic. No-op migration 009 preserves sequence numbering |
+| Trial prompt at day 10, not day 20 | Trial is 14 days — day 20 prompt would fire after trial expires. Day 10 gives 4 days of runway before trial ends |
+| Invite loop invite token on `trip_members` row | No separate `invites` table needed — `007_trip_members.sql` already has `invite_token`, `accepted_at`, `role` columns. Single source of truth |
+
+### Viral Invite Loop — PO Spec Summary (build next)
+
+Two new Edge Functions required: `create-invite` (generates token idempotently, returns existing pending token if one exists) and `accept-invite` (validates token, sets `user_id` + `accepted_at`, returns `trip_id`).
+
+Three new screens: `InviteSheet` (bottom sheet modal — share link, copy, status), `InviteAcceptScreen` (full screen — trip preview, Join CTA), `InviteProScreen` (full screen upsell — "Your travel partner uses Roam Wyld Pro").
+
+Requires: Universal Links (`applinks:roamwyld.app`), `apple-app-site-association` file in `RoamWyld-legal`, `Linking.getInitialURL()` on cold launch, `pendingInviteToken` in root nav context for auth-then-join flow.
+
+One breaking change to existing code: `TripDetailScreen` partner chip tap currently calls `removePartner` directly — must be changed to route through `ActionSheetIOS` before invite loop ships.
+
+Open blocker: App Store numeric ID not yet in `app.json` — Smart App Banner fallback page cannot be finalized until App Store Connect record exists.
+
+### Pre-TestFlight Checklist — Updated
+
+- [x] Gmail revocation UI
+- [x] Server-side rate limiting (transit-directions)
+- [x] All Phase 4 PostHog events wired
+- [x] Beta access system confirmed (003 already existed)
+- [x] Day-10 trial prompt
+- [ ] Viral invite loop (spec done, build next)
+- [ ] Sign in with Apple parity check
+- [ ] Privacy Nutrition Label (App Store Connect)
+- [ ] App icon + splash screen
+- [ ] Sentry error monitoring
+- [ ] FTC affiliate disclosure copy on SafetyWing banner
+- [ ] Wise + iVisa affiliate sign-ups (30 min each, user task)
+- [ ] Update SafetyWing profile SSN → EIN
+
+---
+
 ## Phase 3 Final Close + LLC Formation (June 5, 2026)
 **Session date:** June 5, 2026 (25 days to deadline)
 **Goal:** Form LLC, close Phase 3 with second 12-agent demo panel, add coming-soon banner to roamwyld.app, add roamwyld.app link to portfolio
