@@ -6,6 +6,38 @@ Built by Kirsten Evans (Product Manager) using Claude Code.
 
 ---
 
+## Phase 5 — Session 2: Sentry, FTC Disclosure, Privacy Policy (June 9, 2026)
+**Session date:** June 9, 2026 (continued)
+
+### What Was Built
+
+- **Sentry error monitoring** — `@sentry/react-native ~6.7.0` added to package.json. `Sentry.init()` in App.tsx with `enabled: !__DEV__` (won't fire in dev), `tracesSampleRate: 0.2`. `Sentry.ErrorBoundary` wraps `NavigationContainer`. Root export changed to `Sentry.wrap(App)`. `.env.example` created with `EXPO_PUBLIC_SENTRY_DSN=` placeholder. **User action required:** create project at sentry.io, paste DSN into `.env`.
+
+- **FTC affiliate disclosure** — "Roam Wyld may earn a commission from SafetyWing purchases." added as fine-print below the SafetyWing promo banner in InsuranceScreen. Satisfies FTC 16 CFR Part 255.
+
+- **Privacy Policy — passport nationality added** — PrivacyPolicyScreen "What we collect" section now includes: "Passport nationality — used solely to generate entry requirement checklists. Stored as a country code (e.g., 'US', 'UK'). Not shared with any third party." Anthropic section updated: "Passport nationality is not sent to the Claude API."
+
+### Pre-TestFlight Checklist — Final State
+
+- [x] Gmail revocation UI
+- [x] Server-side rate limiting (transit-directions)
+- [x] All Phase 4 PostHog events wired
+- [x] Beta access system confirmed
+- [x] Day-10 trial activation prompt
+- [x] Viral invite loop (edge functions, screens, deep links)
+- [x] Sentry error monitoring (code wired — DSN needed from sentry.io)
+- [x] FTC affiliate disclosure on SafetyWing banner
+- [x] Passport nationality in Privacy Policy
+- [ ] **Fill in EXPO_PUBLIC_SENTRY_DSN** — create project at sentry.io (user task, 10 min)
+- [ ] **Fill in Apple Team ID** in `website/.well-known/apple-app-site-association` (developer.apple.com/account)
+- [ ] **App icon + splash screen** — final assets needed (user task)
+- [ ] **Sign in with Apple parity check** — verify Google OAuth is not sole account creation method
+- [ ] **Privacy Nutrition Label** — complete in App Store Connect (user task)
+- [ ] **Wise + iVisa affiliate sign-ups** — 30 min each (user task)
+- [ ] **Update SafetyWing affiliate profile** SSN → EIN (Roam Wyld LLC)
+
+---
+
 ## Phase 5 — Session 1: Security, Analytics, Gmail Revocation, Beta Access (June 9, 2026)
 **Session date:** June 9, 2026 (21 days to deadline)
 **Goal:** Ship everything that doesn't require Kirsten — pure code Phase 5 items in parallel
