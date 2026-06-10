@@ -6,6 +6,30 @@ Built by Kirsten Evans (Product Manager) using Claude Code.
 
 ---
 
+## Phase 5 — Session 3: GDPR, Legal, Analytics, RevenueCat (June 10, 2026)
+**Session date:** June 10, 2026 (20 days to deadline)
+
+### What Was Built
+
+- **AI consent logging (GDPR Art. 7(1))** — `010_ai_consent_log.sql` migration. Fire-and-forget Supabase insert on "Generate" tap in both TripDetailScreen and TripScreen: `{ user_id, consented_at, feature: 'transit_directions', dialog_version: '1.0' }`. Provides demonstrable consent record required by GDPR.
+- **Second-traveler privacy disclosure** — one-time Alert after first `savePartner` call: "You're saving [name]'s info to your Roam Wyld account." Gated by AsyncStorage `partnerDisclosureShown` so it only fires once.
+- **LICENSE file** — proprietary copyright notice added to repo root. "All rights reserved. No license granted."
+- **TermsScreen reverse engineering clause** — existing "Acceptable use" bullet replaced with explicit prohibition: "Reverse engineering, decompiling, disassembling, or attempting to derive source code from the App is strictly prohibited."
+- **`trackTripCreated` wired** — fires in TripScreen `saveTrip` on create (not edit). Passes `destinationCount` and `durationDays`.
+- **`trackBookingAdded` wired** — fires in both TripScreen and TripDetailScreen on create (not edit). `source: 'manual'` or `source: 'gmail_import'` per path.
+- **RevenueCat: `ENTITLEMENT_ID` constant** — `RC_ENTITLEMENT` renamed to `ENTITLEMENT_ID` in useProAccess.ts. PaywallModal already correctly gated — no changes needed.
+- **Restore Purchases button** — added to ProfileScreen between Gmail disconnect and Sign Out. Required by App Store. Calls `Purchases.restorePurchases()`, shows "Purchases Restored", "No Subscription Found", or error alert.
+
+### Key Decisions
+
+| Decision | Rationale |
+|---|---|
+| Fire-and-forget for consent logging | A logging failure must never block the user from generating directions — network error on the insert is silent |
+| One-time partner disclosure via AsyncStorage | GDPR requires disclosure at point of collection; AsyncStorage flag ensures it doesn't become a recurring friction point |
+| Restore Purchases placement | Apple requires this to be discoverable; ProfileScreen is the natural home alongside subscription status |
+
+---
+
 ## Phase 5 — Session 2: Sentry, FTC Disclosure, Privacy Policy (June 9, 2026)
 **Session date:** June 9, 2026 (continued)
 
