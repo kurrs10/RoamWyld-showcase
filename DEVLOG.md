@@ -6,6 +6,103 @@ Built by Kirsten Evans (Product Manager) using Claude Code.
 
 ---
 
+## Phase 5 — Session 6: Pods.xcodeproj ${VAR} Fix (June 12, 2026)
+**Session date:** June 12, 2026 (18 days to deadline)
+
+### What Was Built
+
+- **Root cause of persistent "Invalid expression encountered" fully resolved** — After fixing `Voyagr.xcodeproj/project.pbxproj` in Session 5, build continued failing. Traced the remaining error to `ios/Pods/Pods.xcodeproj/project.pbxproj`, which also contained `${VAR}` syntax inside `buildSettings` blocks. Xcode 16.x evaluates these as build setting expressions and fails on curly-brace form. Fixed 6 occurrences:
+  - `REACT_NATIVE_PATH = "${PODS_ROOT}/..."` → `$(PODS_ROOT)` (Debug + Release, 2 each)
+  - `SYMROOT = "${SRCROOT}/../build"` → `$(SRCROOT)` (Debug + Release)
+  - `PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}"` → `$(PRODUCT_NAME:rfc1034identifier)` (Debug + Release)
+- **Sentry SDK hold** — wizard deferred until build pass confirmed. `@sentry/react-native` was previously removed for a C++ compile error; will test after first successful build to isolate variables.
+- **New build queued**: `201492c4-e757-4eb1-a883-6c27b9f6da92` on `macos-sequoia-15.6-xcode-16.4`
+
+### Key Decisions
+
+| Decision | Rationale |
+|---|---|
+| Fix Pods.xcodeproj, not just Voyagr.xcodeproj | Xcode evaluates buildSettings in ALL included .xcodeproj files; CocoaPods-generated Pods project has the same `${VAR}` patterns |
+| Hold Sentry until build passes | Sentry was already removed once for C++ errors; adding it simultaneously with a new pbxproj fix masks which variable caused any failure |
+
+### Problems Solved
+| Problem | Root cause | Fix |
+|---------|-----------|-----|
+| Build still failing after REACT_NATIVE_PATH fix in Voyagr.xcodeproj | `Pods/Pods.xcodeproj/project.pbxproj` had 6 more `${VAR}` in buildSettings | Fixed all 6 to `$(VAR)` form |
+
+---
+
+## Phase 5 — Session 5: All Code Tasks Complete, EAS Build Root Cause Found (June 12, 2026)
+**Session date:** June 12, 2026 (18 days to deadline)
+
+### What Was Built
+
+- **All Phase 5 code tasks complete** — confirmed that trackTripCreated, trackBookingAdded, second-traveler disclosure, TermsScreen reverse engineering clause, and LICENSE were already done from previous sessions. Two remaining gaps fixed this session:
+  1. `consented_at` timestamp added to `ai_consent_log` insert (GDPR Art. 7(1) requires timestamped consent records)
+  2. RevenueCat `purchase()` now verifies `customerInfo.entitlements.active` before calling `onPurchaseSuccess()`. Previously called success callback without confirming the entitlement was granted. Failure branch keeps modal open so user can tap Restore Purchases.
+
+- **EAS build root cause identified: `${PODS_ROOT}` in build settings** — after multiple builds across Xcode 26.0 and Xcode 16.4, traced persistent "Invalid expression encountered" to `REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native"` in both Debug and Release project-level build configurations. Xcode 16.x build settings require `$(...)` syntax; `${...}` triggers "Invalid expression encountered." Fixed both occurrences. This was the real root cause across all failed builds.
+
+- **EAS image pinned to Xcode 16.4** — `eas.json` now pins `macos-sequoia-15.6-xcode-16.4` for both preview and production profiles. EAS had silently defaulted to Xcode 26.0 (brand new major version with breaking changes). Querying `resolvedImage` via GraphQL API identified this after many build attempts.
+
+- **JS obfuscation deferred** — `metro-babel-transformer` returns `{ ast, metadata }` not `{ code }`. The correct approach is a Metro serializer hook (post-bundle). Deferred to post-launch; Hermes bytecode compilation already provides meaningful obfuscation.
+
+### Key Decisions
+
+| Decision | Rationale |
+|---|---|
+| Pin Xcode 16.4 in eas.json, not `latest` | EAS `latest` can silently upgrade to new major Xcode versions; pinning prevents surprise breaking changes |
+| Defer JS obfuscation | Metro transformer API is AST-based; javascript-obfuscator needs source code strings; correct path is serializer hook requiring dedicated testing |
+| Keep modal open on entitlement-not-found | User needs access to "Restore Purchases" button; closing modal on failure leaves them stranded |
+
+### Problems Solved
+| Problem | Root cause | Fix |
+|---------|-----------|-----|
+| EAS build: "Invalid expression encountered" (persistent) | `${PODS_ROOT}` curly-brace syntax in `REACT_NATIVE_PATH` build setting — Xcode 16.x requires `$(...)` | Changed to `$(PODS_ROOT)` in both Debug and Release configs |
+| EAS builds running on Xcode 26.0 | `eas.json` had no image pinned; EAS defaulted to latest which was Xcode 26 | Added `"image": "macos-sequoia-15.6-xcode-16.4"` to preview and production profiles |
+| Obfuscation crashing Metro bundle phase | `metro-babel-transformer.transform()` returns AST not code string | Reverted metro.config.js to plain Expo default; deferred obfuscation |
+
+### Debugging Protocol Added to Memory
+On any unexplained EAS build failure: query `resolvedImage` via GraphQL API before touching project files. Command saved in Claude memory for future sessions.
+
+---
+
+## Phase 5 — Session 4: Auth Analytics, EAS Build Fix, Phase 3 QA Unblock (June 11, 2026)
+**Session date:** June 11, 2026 (19 days to deadline)
+
+### What Was Built
+
+- **Auth analytics events** — `trackUserSignedIn()`, `trackUserSignedUp()`, `trackSignInFailed()` added to `analytics.ts` as typed wrappers (consistent with existing event pattern). `LoginScreen.tsx` wired: success branches on `isSignUp` to fire the correct event; error uses `error.code ?? error.status` (not `error.message`) to avoid PII leaking email addresses into PostHog. All three wrappers are try/catch guarded so an analytics failure can never degrade the auth flow.
+
+- **`.easignore` — EAS build unblocked** — two root causes diagnosed and fixed:
+  1. `ios/.xcode.env.local` contained a hardcoded nvm path (`/Users/cole/.nvm/versions/node/v20.20.2/bin/node`) that doesn't exist on EAS build servers, causing every Xcode build script to fail with "Invalid expression encountered." Excluded from EAS archive.
+  2. `ios/Pods/` (921 MB) was not in `.gitignore` and was being compressed and uploaded, causing upload timeouts at 313 MB. EAS runs `pod install` itself — Pods never need to be uploaded. Excluded from EAS archive.
+
+- **Phase 5 code audit** — discovered that 5 of 7 code tasks on the Phase 5 list were already complete from previous sessions: GDPR AI consent logging, second-traveler disclosure, TermsScreen, LICENSE file, trackBookingAdded/trackTripCreated wiring. Remaining user tasks also partially resolved: Sentry DSN already in `.env`, Apple Team ID already in AASA file (`WA6K3XF5W9`), app icon confirmed final (1024×1024 PNG).
+
+- **Visitor badge added to RoamWyld-showcase README** — `hits.sh` badge tracking page views. GitHub traffic analysis showed post-interview spikes matching Kirsten's share dates (June 3 share → June 5 spike of 22 views/2 uniques; June 8 share → same-day 3 uniques).
+
+### User Tasks Closed This Session
+- SafetyWing affiliate SSN → EIN (Roam Wyld LLC) — done by Kirsten
+- Sign in with Apple parity check — resolved: app uses email/password only; no third-party social login, so SIWA not required under Guideline 4.8
+
+### Key Decisions
+
+| Decision | Rationale |
+|---|---|
+| Separate `user_signed_up` vs `user_signed_in` events | Combined event with `is_new_user` boolean inflates sign-in counts with sign-ups; separate events make funnel analysis cleaner in PostHog |
+| `error.code` not `error.message` for sign_in_failed | Supabase error messages can contain the submitted email address; `error.code` is a stable string like `"invalid_credentials"` with no PII |
+| Exclude Pods from EAS archive | EAS installs pods on its own build servers from Podfile.lock — uploading 921 MB of pre-installed pods is wasted bandwidth and causes upload timeouts |
+
+### Problems Solved
+| Problem | Root cause | Fix |
+|---------|-----------|-----|
+| EAS build: "Invalid expression encountered" | `ios/.xcode.env.local` hardcoded local nvm path not present on EAS servers | Added to `.easignore` |
+| EAS build: upload timeout at 295/313 MB | `ios/Pods/` (921 MB) not in `.gitignore`, included in archive | Added `ios/Pods/` to `.easignore` |
+| QA blocked — no build on device | Required EAS device registration + build | Registered iPhone UDID `00008140-001205EE1490801C`, `.easignore` fixed, preview build queued |
+
+---
+
 ## Phase 5 — Session 3: GDPR, Legal, Analytics, RevenueCat (June 10, 2026)
 **Session date:** June 10, 2026 (20 days to deadline)
 
@@ -651,7 +748,7 @@ Google only returns a refresh token on first grant or after revocation + re-gran
 
 6. **No Gmail revocation UI.** Refresh tokens persist indefinitely with no in-app disconnect option. Add a "Connected Accounts" or "Gmail Access" section in settings with a "Disconnect Gmail" button that calls `clearGmailToken()` AND posts to `https://oauth2.googleapis.com/revoke?token={refresh_token}`.
 
-7. **Privacy policy is a modal component, not a public URL.** Google OAuth verification requires a stable hosted URL. A static page (roam-wyld.app/privacy, Notion, GitHub Pages) satisfies this. Required before submitting for Google OAuth production credentials.
+7. **Privacy policy is a modal component, not a public URL.** Google OAuth verification requires a stable hosted URL. A static page (voyagr.app/privacy, Notion, GitHub Pages) satisfies this. Required before submitting for Google OAuth production credentials.
 
 **What the agent noted is well done:** Gmail consent modal exists and fires before OAuth. `rawSnippet` is stripped before Supabase insert. Google Limited Use disclosure is substantively correct. SecureStore used for token. Passport nationality never written to DB.
 
@@ -677,7 +774,7 @@ Google only returns a refresh token on first grant or after revocation + re-gran
 
 **MEDIUM:**
 
-6. **Google Places API key has no iOS bundle ID restriction in GCP Console.** Anyone with the extracted key can rack up Places API charges. Fix: GCP Console → set Application Restrictions to iOS apps with bundle ID `com.roam-wyld.app` → set API Restrictions to Places API only → add daily quota cap ($20/day). This is the single highest-ROI security action for client-bundled keys.
+6. **Google Places API key has no iOS bundle ID restriction in GCP Console.** Anyone with the extracted key can rack up Places API charges. Fix: GCP Console → set Application Restrictions to iOS apps with bundle ID `com.voyagr.app` → set API Restrictions to Places API only → add daily quota cap ($20/day). This is the single highest-ROI security action for client-bundled keys.
 
 7. **ATS exception for AviationStack lacks reviewer justification text.** Apple requires a written note with each ATS exception during App Review. Prepare: "AviationStack free tier does not support HTTPS. Exception is scoped to that single domain. Only a flight number (non-PII) is sent." Better path: proxy AviationStack through a Supabase edge function — removes both the key from the binary and the ATS exception.
 
@@ -909,7 +1006,7 @@ CPO demo panel Phase 2 recommendation: Phase 3 was already carrying offline arch
 
 **MEDIUM:**
 
-6. **SQLite database unencrypted.** Confirmation numbers and travel PII stored in plaintext. On non-jailbroken devices iOS sandbox provides baseline protection, but iTunes backups (without encryption) and forensic tools can read it. Fix before launch: apply `NSFileProtectionCompleteUntilFirstUserAuthentication` via `app.json` infoPlist; exclude `roam-wyld.db` from iCloud backup via `NSURLIsExcludedFromBackupKey`. Full SQLCipher is a post-launch improvement.
+6. **SQLite database unencrypted.** Confirmation numbers and travel PII stored in plaintext. On non-jailbroken devices iOS sandbox provides baseline protection, but iTunes backups (without encryption) and forensic tools can read it. Fix before launch: apply `NSFileProtectionCompleteUntilFirstUserAuthentication` via `app.json` infoPlist; exclude `voyagr.db` from iCloud backup via `NSURLIsExcludedFromBackupKey`. Full SQLCipher is a post-launch improvement.
 
 7. **CORS wildcard on transit-directions edge function.** Any web origin with a valid JWT can invoke the endpoint. Low practical risk for an iOS-only app but should be tightened before production scale.
 
@@ -1005,7 +1102,7 @@ CPO panel recommended moving both out of Phase 3 to protect the offline architec
 | Problem | Root cause | Fix |
 |---------|-----------|-----|
 | Flight validation silently failing on iOS device builds | AviationStack free tier uses HTTP; iOS ATS blocks non-HTTPS by default | Added `NSExceptionDomains` ATS exception in `app.json` for `api.aviationstack.com` |
-| Gmail OAuth redirect fails on real device | `gmailImport.ts` hardcoded `scheme: 'com.roam-wyld.app'` but `app.json` sets `scheme: 'roam-wyld'` | Fixed redirect URI to use `'roam-wyld'` to match app.json |
+| Gmail OAuth redirect fails on real device | `gmailImport.ts` hardcoded `scheme: 'com.voyagr.app'` but `app.json` sets `scheme: 'voyagr'` | Fixed redirect URI to use `'voyagr'` to match app.json |
 | Edit flight with no flight number triggers hotel validation | `else if` structure meant hotel branch ran when flight branch skipped | Split into two independent `if` blocks |
 | Flight number "UA 123" fails AviationStack | Placeholder showed spaced format; AviationStack expects `UA123` | Added `.replace(/\s+/g, '')` normalization in `checkFlight()` |
 | Edited booking retains old validation badge | `updateBooking()` didn't reset `validation_status` | Added `validation_status: 'pending'` to every `updateBooking()` payload |
@@ -1013,7 +1110,7 @@ CPO panel recommended moving both out of Phase 3 to protect the offline architec
 | Activities and Gmail imports stay `pending` forever | No `updateBookingValidation` call after save | Activities now set to `'skipped'`; Gmail imports set to `'skipped'` after batch save |
 | `monospace` font crashes in production builds | Not a valid iOS font family | Changed to `'Courier New'` |
 | App date pickers render light on dark background | `userInterfaceStyle: "light"` in app.json despite dark-only UI | Changed to `"dark"` |
-| Missing bundle identifier for EAS Build | `app.json` had no `ios.bundleIdentifier` | Added `com.roam-wyld.app` + `buildNumber: "1"` |
+| Missing bundle identifier for EAS Build | `app.json` had no `ios.bundleIdentifier` | Added `com.voyagr.app` + `buildNumber: "1"` |
 
 ### Demo Panel Feedback
 *Phase 2 demo held May 20, 2026. Panel: mobile-developer, engineer architect, UX researcher, UX designer, QA expert, executive product director, QA engineer.*
