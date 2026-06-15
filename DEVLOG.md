@@ -6,6 +6,32 @@ Built by Kirsten Evans (Product Manager) using Claude Code.
 
 ---
 
+## Phase 5 — Session 8: Sentry + RevenueCat + TestFlight Build (June 15, 2026)
+**Session date:** June 15, 2026 (15 days to deadline / 5 days to TestFlight)
+
+### What Was Built
+
+- **Sentry React Native integrated** — `@sentry/react-native ^8.14.0` installed via `@sentry/wizard`. `Sentry.init()` added to App.tsx using `EXPO_PUBLIC_SENTRY_DSN` env var (disabled in `__DEV__`). Session replay enabled (0.1 session rate, 1.0 on errors). `getSentryExpoConfig` replaces `getDefaultConfig` in metro.config.js for source map support. `@sentry/react-native/expo` plugin added to app.json. `SENTRY_AUTH_TOKEN` added to `.env.production` for EAS source map uploads. Supabase CJS redirect preserved in metro.config.
+- **RevenueCat fully configured** — Created iOS app in RC dashboard with bundle ID `com.voyagr.app`, uploaded `SubscriptionKey_W6HTS3844J.p8` (In-App Purchase key, distinct from EAS API key). Created `com.voyagr.app.pro.monthly` and `com.voyagr.app.pro.annual` products under real iOS App Store (not Test Store). Updated `default` offering packages to serve real iOS products. RC entitlement is `Roam Wyld Pro` (identifier locked — can't be changed); updated `ENTITLEMENT_ID` constant in `useProAccess.ts` and `PaywallModal.tsx` to match. iOS SDK key `appl_hzVeAyAicoSIZjuPfEaYduysrNb` added to `.env.production`.
+- **Production TestFlight build triggered** — `fda710ed-16fd-4f01-86dd-75f10daca335` using `eas build --profile production`. New App Store provisioning profile created (7NMML2V88K). This is an App Store distribution build uploadable to TestFlight.
+
+### Key Decisions
+
+| Decision | Rationale |
+|---|---|
+| Update code entitlement ID to match RC, not vice versa | RC doesn't allow editing entitlement identifiers after creation. Changing code constant is a 2-line fix vs recreating all RC entitlement/product associations |
+| `SENTRY_AUTH_TOKEN` in `.env.production` (not EAS secrets) | Simplest path — already using `.env.production` for all build-time vars via `.easignore` negation. EAS secrets would require dashboard setup and wouldn't benefit from the existing pattern |
+| Reuse existing distribution certificate for production | Certificate is valid until May 2027 and already trusted — no reason to generate a new one |
+
+### Problems Solved
+| Problem | Root cause | Fix |
+|---------|-----------|-----|
+| Production build failed non-interactive | App Store provisioning profile not yet created for `production` profile | Ran interactively; EAS generated new profile automatically |
+| RC entitlement ID `Roam Wyld Pro` didn't match code `pro` | RC identifier set June 5, not editable | Updated `ENTITLEMENT_ID = 'Roam Wyld Pro'` in useProAccess.ts and PaywallModal.tsx |
+| Sentry wizard left `Sentry` referenced but unimported in App.tsx | Wizard inserted `Sentry.wrap(App)` export but import/init in a separate step that didn't write correctly | Manually added `import * as Sentry` and `Sentry.init()` block with env var DSN |
+
+---
+
 ## Phase 5 — Session 7: Assets, ADA Colors, Subscription Sync (June 14–15, 2026)
 **Session date:** June 14–15, 2026 (15 days to deadline / 5 days to TestFlight)
 
