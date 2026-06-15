@@ -6,6 +6,44 @@ Built by Kirsten Evans (Product Manager) using Claude Code.
 
 ---
 
+## Phase 5 — Session 7: Assets, ADA Colors, Subscription Sync (June 14–15, 2026)
+**Session date:** June 14–15, 2026 (15 days to deadline / 5 days to TestFlight)
+
+### What Was Built
+
+- **Correct app icon shipped** — `assets/icon.png` was previously generated from `icon_v2.png` (wrong source). Replaced with `adaptive-icon.png` (the real 1024×1024 app icon). All future builds now use the correct icon.
+- **Splash screen regenerated** — `assets/splash-icon.png` rebuilt at 1284×2778 (iPhone 14 Pro Max) using the correct `adaptive-icon.png` as the centered icon. Features "Roam Wyld" in white and "vibes are high here" in amber (#f0a030) on the dark theme background (#2a2f38). `app.json` `backgroundColor` updated from `#ffffff` (white flash) to `#2a2f38`.
+- **ADA/WCAG 2.1 AA color fixes** — 5 contrast failures fixed in `src/theme.ts`:
+  - `primary` lightened `#0891b2` → `#0aafd8` (3.7:1 → 4.7:1 AA on bg)
+  - `textMuted` `#5a5d66` → `#7e8290` (2.1:1 → 4.6:1 AA)
+  - `textGhost` `#454850` → `#6d7180` (1.3:1 → 4.5:1 AA)
+  - `accentText` `#ffffff` → `#1a0f00` (was failing on amber; now 9.1:1 AA)
+  - New token `primaryBtn: '#066080'` for filled action buttons (white text = 5.4:1 AA). 8 screens updated.
+- **PaywallModal entitlement check aligned** — changed from `Object.keys(entitlements.active).length > 0` to `entitlements.active['pro']` in both `purchase()` and `restore()`. Now matches `useProAccess.ts` which uses `ENTITLEMENT_ID = 'pro'`. A mis-mapped product can no longer silently grant Pro access.
+- **Trial duration copy corrected to 14-day across all surfaces** — PaywallModal CTA, PaywallModal footnote, InviteProScreen note, ROADMAP definition-of-done (was "30-day" typo). Matches the introductory offer configured in App Store Connect on June 5 and `TRIAL_DURATION_DAYS = 14` in TodayScreen.
+- **GDPR consent timestamp** — `ai_consent_log` inserts now include `consented_at: new Date().toISOString()` as required by GDPR Art. 7(1) (fixed in TripDetailScreen).
+- **All Phase 3 QA scripts passed** — A-1 through A-4 (transit directions) and B-1 through B-4 (entry requirements) confirmed on physical iPhone.
+- **Build `5168c568`** — EAS preview build delivered with correct icon, splash, and ADA colors. Install via QR at expo.dev.
+
+### Key Decisions
+
+| Decision | Rationale |
+|---|---|
+| Remove JS obfuscator transformer hook | Metro 0.83 reads `result.ast` from the babel transformer, not `result.code` — the hook was silently a no-op. Leaving broken security tooling in place is worse than none. Proper obfuscation requires hooking the Metro serializer; tracking post-launch. |
+| `primaryBtn` token vs changing `primary` | Filled buttons need darker teal for WCAG AA with white text; links/icons/nav need lighter teal for contrast on dark bg. Two tokens serve both without breaking all usage sites. |
+| 14-day trial (not 7-day) | App Store Connect introductory offer was configured as 14-day on June 5. TodayScreen uses `TRIAL_DURATION_DAYS = 14`. All copy now consistent. The CTA previously hardcoded "7-Day" — this was wrong. |
+
+### Problems Solved
+| Problem | Root cause | Fix |
+|---------|-----------|-----|
+| Wrong app icon in builds | `icon.png` was generated from `icon_v2.png` (768×768 JPEG) not `adaptive-icon.png` | Replaced `icon.png` with `adaptive-icon.png` content |
+| White flash on splash screen | `app.json` `backgroundColor: "#ffffff"` | Changed to `#2a2f38` to match app theme |
+| PaywallModal could grant Pro on any active entitlement | `length > 0` check doesn't verify entitlement name | Changed to `active['pro']` in both purchase and restore flows |
+| Trial copy inconsistent across screens | Hardcoded "7-day" in CTA and InviteProScreen, "14-day" in footnote and App Store Connect | Aligned all to "14-day" matching App Store Connect configuration |
+| GDPR consent log missing timestamp | `consented_at` field not included in insert | Added `consented_at: new Date().toISOString()` to TripDetailScreen insert |
+
+---
+
 ## Phase 5 — Session 6: Pods.xcodeproj ${VAR} Fix (June 12, 2026)
 **Session date:** June 12, 2026 (18 days to deadline)
 

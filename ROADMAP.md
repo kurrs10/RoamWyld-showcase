@@ -179,17 +179,17 @@ These features are individually lower complexity but collectively eliminate Goog
 - **Terms of Service:** Include prohibition on reverse engineering in app ToS before App Store submission
 - **Form LLC (before App Store submission):** Register a single-member LLC in Wyoming — ~$100 to form, $60/year. File at wyofile.wyo.gov. Takes ~20 min online, no lawyer needed. Use the LLC name + EIN in App Store Connect, RevenueCat, and affiliate agreements (Airalo, SafetyWing). Once formed, update SafetyWing affiliate profile to replace personal SSN with business EIN.
 - **⚠️ Trademark Roam Wyld (post-launch, optional at this stage):** File only after app proves traction — ~$350 at uspto.gov, Class 42. Protection begins at filing date.
-- **Portfolio showcase repo:** Create public `kurrs10/roam-wyld-showcase` repo with polished README, screenshots, architecture overview, and sanitized code samples — links to this from portfolio site instead of private main repo
+- **Portfolio showcase repo:** Create public `kurrs10/voyagr-showcase` repo with polished README, screenshots, architecture overview, and sanitized code samples — links to this from portfolio site instead of private main repo
 - TestFlight build: internal beta for real-world trip trial with beta users
 - App Store submission
 - **Post-launch: Reapply to Airalo affiliate program** — application was rejected before App Store launch; reapply at partners.airalo.com with live App Store URL → get Impact publisher ID → update `AIRALO_AFFILIATE_ID` in `src/services/affiliates.ts`
-- **Gmail OAuth — switch to development build for testing:** `npx expo run:ios` creates a standalone build where the `roam-wyld://` custom URL scheme works natively. Remove the `exp://` redirect URIs from Google Cloud Console after this; add `com.roam-wyld.app` as an iOS OAuth client (bundle ID) if not already present. This permanently resolves the Expo Go redirect URI mismatch and is required before TestFlight anyway.
+- **Gmail OAuth — switch to development build for testing:** `npx expo run:ios` creates a standalone build where the `voyagr://` custom URL scheme works natively. Remove the `exp://` redirect URIs from Google Cloud Console after this; add `com.voyagr.app` as an iOS OAuth client (bundle ID) if not already present. This permanently resolves the Expo Go redirect URI mismatch and is required before TestFlight anyway.
 
 ### Definition of done
 - App is installable on iPhone via TestFlight
 - RevenueCat entitlement gates all Pro features correctly
 - Beta users (by user_id) can access all Pro features without a subscription
-- Introductory offer (30-day trial) confirmed active in App Store Connect before submission
+- Introductory offer (14-day trial) confirmed active in App Store Connect before submission
 - Group invite link works: recipient downloads app, opens shared trip, sees Pro upgrade prompt
 - LICENSE file present, ToS includes reverse engineering prohibition
 - Trademark application filed at USPTO
