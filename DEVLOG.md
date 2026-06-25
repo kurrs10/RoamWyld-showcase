@@ -6,6 +6,219 @@ Built by Kirsten Evans (Product Manager) using Claude Code.
 
 ---
 
+## 🚀 APP STORE SUBMITTED — June 25, 2026
+
+**Roam Wyld v1.0 submitted to Apple App Store review at 10:35 AM MT on June 25, 2026. 5 days ahead of the June 30 deadline.**
+
+Build 8 (1.0.0 build 8) — iPhone only, `supportsTablet: false`.
+
+---
+
+## Phase 5 — Session 13: App Store Submission (June 25, 2026)
+**Session date:** June 25, 2026 (5 days ahead of deadline)
+
+### What Was Built / Completed
+
+**Transit Directions — Removed for v1.0:**
+- Feature was returning 502 errors from Supabase Edge Function despite multiple fix attempts (JSON extraction fix, `upsert_transit_rl` SQL function creation)
+- Decision: remove entirely for clean submission, re-add in v1.1 post-launch
+- Removed from `TripDetailScreen.tsx`: imports, 9 state vars/refs, 2 useEffects, 4 `clearCachedDirections` calls, `fetchDirections()` function, directions button, Transit Directions Modal, Maps confirmation sheet modal
+- Removed from `PaywallModal.tsx`: AI Transit Directions Pro feature row
+- App Store description updated to remove transit directions from Pro features list
+- QA: GO — no broken references, no runtime crash risk, all surviving features intact
+
+**App Store Submission:**
+- All metadata completed (description, keywords, support URL, marketing URL, copyright, age rating 4+)
+- Content Rights: set to "No third-party content"
+- In-app purchases confirmed Ready to Submit (Pro Annual + Pro Monthly)
+- App Privacy completed
+- Pricing: Free
+- Screenshots: 6 iPhone 6.9" screenshots uploaded; 6 iPad 13" screenshots generated (2064×2752) from iPhone originals
+- Builds 6 and 7 completed on EAS but were not auto-submitted to Apple (missing `eas submit` step — added to process)
+- Build 8 (`supportsTablet: false`) built and submitted via `eas submit`
+- **"1 Item Submitted" confirmed in App Store Connect at 10:35 AM**
+
+**Roadmap:**
+- Per-trip budgeting experience added to future features (v1.1)
+
+### Key Decisions
+- **supportsTablet: false** — app not designed for iPad; removes iPad screenshot requirement
+- **Transit directions cut** — 502s unresolved after 3 fix attempts; feature ships in v1.1 with proper debugging
+- **`eas submit` must be run separately** — EAS build does not auto-submit to App Store Connect; added to build protocol
+
+### What's Next (Post-Launch)
+- Monitor Apple review (up to 48 hours)
+- Fix transit directions Edge Function and re-add in v1.1
+- Submit Gmail OAuth verification to Google (BUG-NOTE-34)
+- Set up Xcode + simulator for Maestro automated testing
+- Per-trip budgeting feature (v1.1)
+
+---
+
+## Phase 5 — Session 12: Build 5 Live QA + Bug Fix Batch (June 12–24, 2026)
+**Session date:** June 12–24, 2026 (6 days to deadline)
+
+### What Was Built
+
+**Test Script Reorganization:**
+- `TEST_SCRIPTS_BUILD5.md` completely rewritten from GROUP-based to progressive data-state order: empty states → profile setup → no destinations → US domestic → international multi-destination → add bookings → full feature sweep. 6 App Store screenshot moments embedded.
+
+**Live QA Session — Build 5 (v1.0.0, buildNumber 5):**
+Kirsten ran 45+ test cases live on TestFlight. Full bug list captured and categorized.
+
+**Bug Fixes Applied (this session):**
+
+| Fix | File(s) | Description |
+|-----|---------|-------------|
+| Offline banner never showing | `supabase.ts`, `trips.ts`, `bookings.ts`, `TripListScreen.tsx` | Added 5s AbortController timeout to all Supabase requests. Removed internal error-swallowing try/catch from `fetchTrips()` and `fetchBookings()` — they now throw, letting screen-level catch trigger offline state + cache fallback |
+| Destination lookup fails for bare city names | `emergencyInfo.ts`, `currencyTipping.ts` | Added `CITY_TO_COUNTRY` maps. Emergency + Currency now handle "tokyo" (no country) by mapping city name → country code as final fallback |
+| Discover suggestions wiped on offline | `DiscoverScreen.tsx` | `getSuggestions()` catch block now preserves existing suggestions when going offline; error only set if no suggestions exist |
+| Stale suggestions on rapid dest switch | `DiscoverScreen.tsx` | Added `activeDestIndexRef` (ref, not state) to guard against stale closures; catch block now checks both trip ID and dest index |
+| Destination switch shows collapsed prefs + no CTA | `DiscoverScreen.tsx` | `handleDestinationSwitch()` now resets `prefsCollapsed` to false so the full prefs panel + "Get Suggestions" CTA are visible |
+| Trips tab double-tap goes to detail not list | `TabNavigator.tsx` | Added `listeners` to Trips tab: intercepts tabPress, dispatches `CommonActions.navigate({ name: 'Trips', params: { screen: 'TripList' }})` when already deep in the stack |
+| Emergency screen slide direction inconsistent | `TripDetailScreen.tsx` | `navigation.navigate('Emergency')` → `navigation.push('Emergency')` for consistent rightward slide |
+| "Update Trip Dates" didn't open edit modal | `TripDetailScreen.tsx` | Closes booking sheet first via `setShowBookingModal(false)`, waits 300ms for dismiss animation, then calls `openEditTrip()`. Moved `tripDatesUpdatedBanner` from booking modal into edit trip modal where it's actually visible |
+| Insurance load error showed Alert dialog | `InsuranceScreen.tsx` | Added `loadError` state; failure now shows inline empty state with Retry button instead of Alert |
+| Large white gap in Insurance tab | `InsuranceScreen.tsx` | `header` paddingTop 60 → 16 (screen is embedded inside EmergencyScreen, not standalone) |
+| Insurance INSERT permission denied | `supabase/migrations/011_insurance_rls_fix.sql` | Replaced `FOR ALL USING` policy with 4 explicit policies (SELECT, INSERT, UPDATE, DELETE); explicit `WITH CHECK` on INSERT and UPDATE |
+| Emergency passport defaults to US | `EmergencyScreen.tsx` | Default passport state changed from `'US'` to `'all'`; saved pref loads async and upgrades if valid |
+| Hotel bookings showed "Flight number recognized" badge | `TripDetailScreen.tsx` | Validation badge gated on `booking.type === 'flight'`; separate hotel badge for hotel type |
+| Discover section header showed only city | `DiscoverScreen.tsx` | `selectedDestination.split(',')[0]` → `selectedDestination` (shows full "Tokyo, Japan") |
+| End date didn't auto-advance when start date set | `TripListScreen.tsx`, `TripDetailScreen.tsx` | Added auto-advance logic: when start date changes and end date ≤ new start date, set end to start + 7 days |
+| Today screen showed past trips | `TodayScreen.tsx` | Past trips removed from `focusTrip` selection; only active or upcoming trips shown |
+| Today screen didn't show next booking | `TodayScreen.tsx` | Added `nextBooking` state; SQLite query fetches first future booking for the focused trip |
+| Pill padding misaligned in Emergency + Currency | `EmergencyScreen.tsx`, `CurrencyScreen.tsx` | `paddingVertical: 8 → 6`, added `justifyContent: 'center'`, `lineHeight: 18` on tab pill text |
+
+### Problems Solved / Root Cause Analysis
+
+**Why 45+ bugs were found in Build 5:**
+1. **Service layer swallowing errors:** `fetchTrips()` and `fetchBookings()` had internal try/catch that returned cached data silently on any error. Offline screens set `setIsOffline(true)` only in their own catch blocks — which never fired. This is a systemic architecture mistake, not a test gap.
+2. **No timeout on Supabase requests:** Requests hung indefinitely offline instead of failing fast. With no timeout, the "offline" UX path was never exercised in testing.
+3. **Destination format inconsistency:** Destinations stored as typed (lowercase, bare city names) rather than normalized. Lookup functions assumed "City, Country" or country name format. Gap between what the DB stores and what the lookup expected.
+4. **Requirements gaps:** PO requirements didn't specify: (a) tab re-tap behavior, (b) exact destination display format, (c) Discover state after destination switch, (d) insurance RLS requirements. Missing requirements → missing implementation.
+5. **Test scripts were group-based not state-progressive:** Old tests jumped to features without establishing prerequisite state. New scripts force progressive data setup: empty → profile → one trip → multi-destination → bookings.
+
+### Key Decisions
+
+- **Session auto-end rule added to CLAUDE.md:** If Kirsten is dormant 1+ hour, treat as session end → output status block, update DEVLOG, sync showcase.
+- **Standards-first rule wired into CLAUDE.md:** All agents must consult `reference_standards_memory.md` before implementing any UI pattern. Scrum master responsible for keeping it updated.
+- **Discover preferences persist across trips and destinations** (intentional design decision confirmed by Kirsten — preferences are user-level, not trip-level).
+- **Discover section header shows full "City, Country"** — Kirsten overrode original requirement that said city-only.
+- **`tripDatesUpdatedBanner` moved from booking modal to edit trip modal** — previous location was inside the modal that closes before the banner was ever visible.
+
+### Outstanding (Needs Future Build / PO Design)
+
+- BUG-NOTE-02: "Add a New Trip" CTA from empty states + post-add landing page
+- BUG-NOTE-03: Hospital tappable Maps link (deep link to nearest ER)
+- BUG-NOTE-09: "Add to Trip" from Discover suggestions — PO to design full flow
+- BUG-NOTE-10: Apple Maps vs Google Maps choice action sheet
+- BUG-NOTE-24/25/26: Insurance Gmail import, date picker defaults, trip pre-selection
+- BUG-NOTE-30: Past Trips dedicated screen in My Trips
+- BUG-NOTE-34: Gmail OAuth app verification (takes 1-4 weeks, must start now)
+- BUG-NOTE-36: Verify all entry requirement data against government SOTs
+- BUG-NOTE-41/42: Google Places validation on entry, Transit Directions 502 error
+- BUG-NOTE-43: Paywall "Restore Purchases" UX redesign
+- BUG-NOTE-44: Travel partner user lookup + invite flow
+- BUG-NOTE-45: Invite Edge Function returning non-2xx
+- Migration 011 must be run in Supabase dashboard to fix Insurance INSERT
+
+### App Store Screenshots
+
+6 screenshots selected from Kirsten's Build 5 test session, scaled from 1206×2622 → 1320×2868 (6.9" iPhone requirement):
+- SS-01: Japan & Indonesia TripDetail with 10 bookings
+- SS-02: Tokyo Discover suggestions
+- SS-03: Japan & Indonesia entry requirements (eVisa)
+- SS-04: USD/Colorado currency + tipping guide
+- SS-05: Indonesian phrases on Today screen
+- SS-06: Indonesia emergency + US embassy
+
+---
+
+## Phase 5 — Session 11: Sentry Fix Shipped, Production Build #2, Wise Spend-Smart Card (June 16, 2026)
+**Session date:** June 16, 2026 (14 days to deadline)
+
+### What Was Built
+
+- **Sentry version mismatch fixed and verified safe.** Downgraded `@sentry/react-native` from `8.14.0` to `7.2.0` to match what Expo SDK 54 expects. QA caught that the npm install silently dropped the transitive `@sentry/expo-upload-sourcemaps` dependency and downgraded `@sentry/cli` 3.5.0→2.55.0 — both restored explicitly as pinned devDependencies. Verified via `npx expo prebuild --clean` that the Sentry Xcode config plugin still wires both build phases (`sentry-xcode.sh`, `sentry-xcode-debug-files.sh`) correctly against the new package. Confirmed `mobileReplayIntegration`, `replaysSessionSampleRate`/`replaysOnErrorSampleRate`, and `_experiments.enableLogs` all still exist in v7.2.0 — `App.tsx` needed zero changes.
+- **Removed dead `Sentry` import** from `PaywallModal.tsx` (leftover from when Sentry capture calls were replaced with on-screen `offersErrorDetail` text).
+- **Production build #2 shipped** — bundled the Sentry fix, the maps confirmation sheet (code-complete since Session 10), and the already-applied `autoIncrement` fix. Build succeeded; `appBuildVersion` correctly bumped 1→2, confirming the autoIncrement fix works. This is now over the month's included Expo Starter build credits — billing at pay-as-you-go rates going forward (resets July 11).
+- **Build #2 submitted to TestFlight and processing.** Kirsten ran `eas submit --platform ios --profile production --latest` herself (Apple ID 2FA required, couldn't be automated). The "ensure app exists" step was the only interactive part — the actual binary upload already used the EAS-stored App Store Connect API key (`MB2SW7C743`). The run revealed the ASC App ID (`6774633699`), now added to `eas.json`'s submit profile (`ascAppId`), so future submits should run fully non-interactively without needing Kirsten's Apple ID/2FA at all.
+- **Wise "Spend Smart" card added to CurrencyScreen** — replaced the old one-line "Send money abroad with Wise" banner with a collapsible educational card: static comparison of travel card vs. bank card vs. airport exchange fees, a "Get a Wise card →" CTA linking to Kirsten's flat referral URL, and an always-visible affiliate disclosure line. Scoped deliberately as education + referral only, not a money-movement feature, per explicit instruction. `getWiseLink()` in `affiliates.ts` simplified to always return the flat referral URL (previously built a `/send` deep link with currency query params). Scrum-master and product-owner both confirmed this was already Phase-4-planned work (not new scope) — just swapping in the real link and reframing the copy from "send money" to "spend money without fees."
+- **Renamed "VOYAGR" → "Roam Wyld"** across the private repo's `BETA_FEEDBACK.md`, `METRICS.md`, `STRATEGY.md`, and `docs/posthog-dashboards.md` — these had drifted from the already-rebranded showcase repo.
+
+### Problems Solved
+
+| Problem | Root cause | Fix |
+|---------|-----------|-----|
+| Sentry downgrade risked breaking sourcemap uploads | npm silently removed transitive `@sentry/expo-upload-sourcemaps` dep when `@sentry/react-native` was downgraded | Restored `@sentry/expo-upload-sourcemaps@8.14.0` and `@sentry/cli@3.5.0` as explicit pinned devDependencies; verified via local `expo prebuild` |
+| Couldn't verify Sentry API compatibility locally | `npx expo install --check` blocked by stale `EXPO_TOKEN` | Verified directly via grep against `node_modules` type defs and scripts instead |
+| TestFlight submission failing non-interactively | No App Store Connect API key configured in `eas.json` submit profile — `eas submit` falls back to interactive Apple ID login | Not yet fixed — needs Issuer ID from Kirsten to wire up `AuthKey.p8` for non-interactive submits |
+| Wise banner mislabeled as "send money" tool | Old copy/deep-link was written for Wise's transfer product, not its spend-abroad card | Reframed entirely around fee-free spending, swapped in flat referral link |
+
+### Up Next
+
+Submit build #2 to TestFlight (pending Apple ID 2FA or ASC API key setup). Once it lands, verify the real RevenueCat `offersErrorDetail` text on-screen and confirm Sentry now receives events.
+
+---
+
+## Phase 5 — Session 10: App Store Connect Metadata, Build Numbering Bug, RC Investigation (June 15–16, 2026)
+**Session date:** June 15–16, 2026 (14 days to deadline)
+
+### What Was Built
+
+- **App Store Connect subscription products reached "Ready to Submit"** — both `com.voyagr.app.pro.monthly` and `com.voyagr.app.pro.annual` were stuck on "Missing Metadata." Two separate causes found and fixed: a missing Review Screenshot (Apple rejects most listing-size screenshots for the subscription Review Information section — only 5.5", 1242×2208, was accepted) and a missing Localization on the subscription **group** itself (separate from each product's own localization). Annual also needed its "1 Year Upfront" Availability configured.
+- **Maps confirmation sheet, code-complete** — `TripDetailScreen.tsx` now shows an editable From/To bottom sheet before opening Maps from a transit-directions segment, instead of launching Maps directly off the AI-guessed `seg.from`/`seg.to`. Verified end-to-end in code review; not yet in a shipped build.
+- **Business verification submitted** — drafted and submitted the "Explain what Roam Wyld does" business overview required for subscription/payment verification.
+- **Root-caused the Sentry "zero events ever received" mystery** — pulled and decoded the brotli-compressed build log for build `8ea8c55f` directly from EAS's GCS log URLs. `expo doctor`'s `RUN_EXPO_DOCTOR` phase output shows a major version mismatch: Expo SDK 54 expects `@sentry/react-native ~7.2.0`, but the project has `8.14.0` installed. The native Sentry pod compiles and links correctly, but the version is two majors ahead of what Expo's SDK 54 config plugin was built against — the leading suspect for native init silently no-op'ing. Fix identified (not yet applied): `npx expo install @sentry/react-native` to align to the Expo-compatible version, bundled into the next build.
+- **Found why TestFlight only ever showed one build** — `app.json` hardcodes `"buildNumber": "1"` with no `autoIncrement`. All three production builds this week (`e3fa6ba7`, `58e18ff2`, `8ea8c55f`) shipped as build 1.0.0 (1). Apple silently drops/ignores a re-upload of an identical build number, which is why TestFlight's build history only ever listed one entry — the on-screen RC error debug text from "build 3" never actually reached the device. Fixed going forward: added `"autoIncrement": true` to the `production` profile in `eas.json`.
+
+### Problems Solved
+
+| Problem | Root cause | Fix |
+|---------|-----------|-----|
+| TestFlight only shows 1 build despite 3 production builds this week | `app.json` had a hardcoded `buildNumber: "1"`, no autoIncrement — Apple drops duplicate build-number uploads | Added `"autoIncrement": true` to `eas.json` production profile |
+| Subscription products stuck "Missing Metadata" | (1) Review screenshot wrong dimensions for subscription review (only 1242×2208 accepted) (2) subscription group itself needs its own Localization, separate from each product's | Uploaded correctly-sized screenshot; added group-level Localization ("Roam Wyld Pro"); set Annual's "1 Year Upfront" availability |
+| Sentry has never received a single event in production | `@sentry/react-native` installed at `8.14.0`, two majors ahead of the `~7.2.0` Expo SDK 54 expects (confirmed via decoded build log `expo doctor` output) | Identified fix (`npx expo install @sentry/react-native`); not yet applied — queued for next bundled build |
+| RevenueCat `getOfferings()` still failing after App Store Connect metadata fixed | Unknown — pending on-screen error detail from a build that, per the build-numbering bug above, never actually reached the test device | Still investigating; on-screen `offersErrorDetail` debug text is in code (`PaywallModal.tsx`) but needs a build with a real, incremented build number to verify |
+
+### Process Note: Build Credit Incident
+
+Three production builds were triggered in a single session — two of them chasing an unconfirmed debug theory, including one solely to add a log line. This burned 100%+ of the month's Expo Starter plan build credits ($46 of $45). Going forward: no build is triggered without an explicitly stated, confirmed root cause and a bundled set of fixes; max one build per session without explicit approval. (Credits reset July 11, 2026.)
+
+### Up Next
+
+Bundle into the next build: the Sentry version fix, the maps confirmation sheet, and the autoIncrement fix (already in `eas.json`). Once that build lands with a real build number, verify the RC paywall error on-screen and confirm Sentry actually receives an event.
+
+---
+
+## Phase 5 — Session 9: Production Build Fixed + Submitted to TestFlight (June 15, 2026)
+**Session date:** June 15, 2026 (15 days to deadline)
+
+### What Was Built
+
+- **Production build `e3fa6ba7` succeeded on Xcode 26** — previous build `fda710ed` had two fatal issues; both resolved this session (see Problems Solved). New build completed in 5m 59s (6m 39s total).
+- **Submitted to TestFlight** — `eas submit --platform ios --profile production --latest` uploaded the IPA to App Store Connect. App Store Connect API key created (Key ID `MB2SW7C743`, ADMIN role, stored in EAS for future submits). Binary processing by Apple as of June 15 11:59 AM.
+- **`SENTRY_AUTH_TOKEN` set as EAS project secret** — token registered via `eas env:create production --visibility secret` so it's available to the Xcode build phase (where sentry-cli runs). Previously the token was only in `.env.production`, which Expo injects into the JS bundle environment but not the native build environment.
+- **`SENTRY_ALLOW_FAILURE=true` added to `eas.json` production env** — safety net so a Sentry source map upload failure never blocks a future build.
+- **Xcode image updated in `eas.json`** — both `preview` and `production` profiles now use `macos-sequoia-15.6-xcode-26.0` (was `xcode-16.4`). Required for App Store submission since April 28, 2026.
+
+### Key Decisions
+
+| Decision | Rationale |
+|---|---|
+| EAS secret for `SENTRY_AUTH_TOKEN` (not `.env.production`) | `.env.production` is read by Expo CLI and bundled into the JS env, but the Xcode build phase runs as a separate process and never sees it. EAS secrets are injected at the OS level and reach sentry-cli. |
+| Keep `SENTRY_ALLOW_FAILURE=true` even with working token | Source map upload is a nice-to-have, not a build requirement. Network blips or token rotation should never take down a production build. |
+| `macos-sequoia-15.6-xcode-26.0` (not `macos-tahoe-26.4-xcode-26.4`) | SDK 54 image. Using the SDK-matched image avoids accidental toolchain mismatches while still satisfying Apple's Xcode 26 requirement. |
+
+### Problems Solved
+
+| Problem | Root cause | Fix |
+|---------|-----------|-----|
+| `sentry-cli: Auth token is required` — killed build `fda710ed` | `SENTRY_AUTH_TOKEN` in `.env.production` is only available to the JS bundle environment, not to the Xcode build phase where sentry-cli runs | Set token as EAS project secret (`eas env:create`); added `SENTRY_ALLOW_FAILURE=true` to eas.json as backup |
+| Build `fda710ed` could not be submitted to App Store | Apple requires Xcode 26+ for all App Store submissions since April 28, 2026; build used Xcode 16.4 | Updated `eas.json` production image to `macos-sequoia-15.6-xcode-26.0` |
+
+---
+
 ## Phase 5 — Session 8: Sentry + RevenueCat + TestFlight Build (June 15, 2026)
 **Session date:** June 15, 2026 (15 days to deadline / 5 days to TestFlight)
 
