@@ -16,28 +16,75 @@ No single app currently combines these four features:
 
 Individually, partial versions exist (Rome2Rio for routing, Sherpa for visa info, TripIt for email import) — but none are integrated into a single trip companion that knows your specific bookings.
 
-### Competitor Matrix
+### Competitor Matrix (Updated June 26, 2026 — Post Deep Research)
 
-| Feature | TripIt Pro | Wanderlog Plus | TripCase | Rome2Rio | AI Itinerary Startups | Roam Wyld |
-|---------|-----------|---------------|---------|---------|----------------------|--------|
-| Email/booking import | Strong | Moderate | Strong (corporate) | None | None | Strong + validation |
-| Booking validation | None | None | None | None | None | Yes |
-| Step-by-step transit | None | None | None | Partial (no platform) | None | Yes, offline |
-| Entry requirements | None | None | None | External link only | None | Yes, per-passport |
-| Schengen tracking | None | None | None | None | None | Yes |
-| Offline completeness | Partial | Partial (paywall) | Partial | None | None | Full |
-| AI features | None | Generic suggestions | None | None | Generation only | Cached, itinerary-tied |
-| Group mode | Basic sharing | Strong collaboration | None | None | None | Yes (color-coded) |
-| App Store rating | ~4.8 ★ | ~4.7 ★ | ~4.2 ★ | ~4.5 ★ | Varies | Target 4.5+ |
-| Pricing | $49/yr | $39.99/yr | Free | Free | Free/varies | $24.99/yr |
+| Feature | Roam Wyld | Tripsy Pro | TripIt Pro | CheckMyTrip | Mindtrip |
+|---|---|---|---|---|---|
+| Pricing | $4.99/mo · $29.99/yr | $9.99/mo · $59.99/yr | $48.99/yr | Free | Free |
+| App Store rating | Target 4.5+ | 4.7★ (4,766 ratings) | 4.8★ (298K ratings) | ~4.0★ | New |
+| Gmail import (OAuth, no forwarding) | Yes | No (forward-to only) | Yes (auto-scan) | No | No |
+| Offline — full itinerary | Yes | Yes | Partial | Partial | No |
+| Visa / entry requirements | Yes (50+ countries, offline) | No | Yes (260+ countries, Pro, online only) | No | No |
+| Per-passport logic | Yes | No | Yes (Pro) | No | No |
+| Offline visa/entry info | **Yes — unique** | N/A | **No — online only** | N/A | N/A |
+| Schengen 90/180 tracker | **Yes — unique** | No | No | No | No |
+| Live booking validation | **Yes — unique** | No | No | No | No |
+| Emergency contacts (offline) | Yes | No | Partial (embassy) | No | No |
+| Language basics (offline) | Yes | No | No | No | Camera only |
+| Insurance storage | Yes | No | No | No | No |
+| Currency converter (offline) | Yes | No | Rates online only | No | No |
+| Real-time flight alerts | **No — gap** | Yes (Pro) | Yes (Pro) | Yes (free) | No |
+| Expense tracking | No | Yes (Pro) | No | No | No |
+| Weather forecast | No | Yes (10-day, Pro) | No | No | No |
+| Trip cover photos / themes | No | Yes — best in class | No | No | No |
+| Apple Watch app | No | Yes | No | No | No |
+| AI itinerary planning | No | No | No | No | Yes |
+| Collaborative group planning | No | Yes (Pro) | Yes | No | Yes |
+| Web / desktop interface | No | No | Yes | Yes | Yes |
+| Android | No | No | Yes | Yes | No (in dev) |
+
+### What Roam Wyld Wins On (No Competitor Matches)
+
+1. **Schengen 90/180 tracker** — zero competitors have it; digital nomads and long-stay EU travelers have no app solution today
+2. **Offline visa + entry requirements** — TripIt has visa info but requires internet; at a border with no data, Roam Wyld works, TripIt shows a loading spinner
+3. **Live booking validation** — B2B fraud tech brought to consumers; no consumer app validates flight numbers against AviationStack
+4. **Price vs. value** — $29.99/yr vs. Tripsy $59.99/yr with a stronger feature set for international travelers
+
+### Where Roam Wyld Has Gaps (v1.1 Targets)
+
+1. **Real-time flight alerts** — TripIt, Tripsy, and CheckMyTrip all have this; it's the #1 reason users run a second app alongside Roam Wyld; **highest priority v1.1 feature**
+2. **Trip cover photos / aesthetic design** — Tripsy's cover photos create emotional pre-trip engagement; users open it just to look at their trip; Roam Wyld needs this to compete on delight
+3. **Expense tracking** — Tripsy's most-praised non-core feature
+4. **No web client** — limits desktop trip planning; medium-term gap
+
+### Messaging Strategy: Own the Unmet Needs
+
+These pain points appear across competitor reviews. Roam Wyld solves all of them — but must say so explicitly:
+
+| User pain point | Roam Wyld answer | Where to say it |
+|---|---|---|
+| "App gave me wrong info, almost missed my flight" | Booking validation against live data | App Store subtitle, onboarding |
+| "Useless without data" | Works when you land, even without a SIM card | Hero message, App Store screenshots |
+| "I use 3 apps for one trip" | One app for the whole international trip | Positioning tagline |
+| "Schengen rules terrify me" | Schengen tracker — days of freedom remaining | Feature section, Reddit/community |
+| "Customer support doesn't exist" (TripIt complaint) | Respond to every early review personally | Execution, not copy |
+
+### Tripsy Aesthetic Gap — Action Required
+
+Tripsy's UI creates emotional pre-trip engagement through trip cover photos, card layouts, and visual hierarchy. This is their primary acquisition driver and photographs beautifully for App Store screenshots.
+
+**What Roam Wyld needs (v1.1):**
+- Trip cover photo per trip (user-selectable or auto from destination)
+- Entry requirements presented as "You're clear to go" (green confidence signal, not a compliance checklist)
+- Schengen tracker framed as "days of freedom remaining," not days counted against you
+- App Store screenshots leading with aspirational trip view, safety features shown in context of real trips
 
 ### Pre-Launch Competitive Verification Checklist
 
 Before finalizing App Store copy, verify live:
-- [ ] Wanderlog's current offline depth (most likely to have closed gaps since mid-2025)
-- [ ] Any new AI travel companion apps launched between Aug 2025 and launch date
+- [x] Tripsy, TripIt Pro, CheckMyTrip, Mindtrip — deep competitive teardown completed June 26, 2026
+- [ ] Any new AI travel companion apps launched since June 2026
 - [ ] Apple's iOS travel feature expansion in latest iOS release
-- [ ] Sherpa.io accuracy for 5 key routes (benchmark for entry requirements quality)
 
 ---
 
@@ -67,27 +114,24 @@ Before finalizing App Store copy, verify live:
 
 ### Pricing Strategy
 
-**Launch pricing: $1.99/month · $14.99/year**
+**Current pricing: $4.99/month · $29.99/year** (set at App Store submission, June 25, 2026)
 
-- $14.99/year is the headline offer — frame as "Save 37%" vs. monthly equivalent ($23.88)
-- $1.99/month exists as an entry point, not the primary pitch
-- Lead with annual on the App Store product page
+- Annual plan is the headline offer
+- 14-day free trial on both plans
+- Market context: Tripsy Pro $59.99/yr, TripIt Pro $48.99/yr — Roam Wyld undercuts both despite stronger feature set for international travelers
 
-**Why not $3.99/month at launch:** Zero reviews means zero social proof. At $3.99/month the annual math hits $47.88 before the user has seen a single review from a stranger. At $1.99/month / $14.99/year, the decision feels like "try it before everyone knows about it."
+**Pricing evaluation schedule (do NOT change pricing before completing this data review):**
 
-**Free trial:** 30 days on monthly, 14 days on annual. Longer than typical because Roam Wyld's value is trip-contextual — a user with no upcoming trip won't see it in 7 days. Build a day-20 prompt: "You have 10 days left — create your first trip to see Roam Wyld in action."
+| Checkpoint | What to evaluate | Potential action |
+|---|---|---|
+| 30 days post-launch | Trial-to-paid conversion rate vs. 48.7% travel app benchmark | Hold or adjust |
+| 60 days post-launch | Annual vs. monthly split (target: 60%+ annual) | Hold or adjust |
+| 90 days post-launch | Churn rate, LTV estimate, review sentiment on price | Consider raise to $39.99/yr |
+| 120 days post-launch | Full cohort data — paid CAC vs. LTV if any paid acquisition tested | Final pricing decision |
 
-**Price increase triggers:**
+**When to raise to $39.99/yr:** Research shows $29.99/yr is below market floor vs. competitors. However, raise only after 90+ days of conversion data. If trial-to-paid is above 40% and churn is below 5%/month, a raise to $39.99 is justified and keeps Roam Wyld $20 below Tripsy while capturing more value.
 
-| Milestone | New Price | When |
-|-----------|----------|------|
-| 200 reviews at 4.4+ stars OR 6 months post-launch | $2.99/month · $24.99/year | ~Q4 2026 |
-| 500 reviews at 4.5+ stars | $3.99/month · $34.99/year | ~2027 |
-| v1.1 feature release (expense splitting + packing list) | Tie price increase to release | Narrative: "More powerful, price updated to match" |
-
-Communicate raises 30 days in advance in-app. Frame it as earned, not opportunistic: "Locking in your current rate before the price increase."
-
-**Do not offer lifetime purchase at launch.** Rewards your most loyal users by capping your revenue from them. If you want to reward early adopters, let them keep their current rate forever when prices rise.
+**Free trial:** 14 days on annual. Travel apps convert at 48.7% median trial-to-paid — the product just needs enough time to show value across a planning cycle.
 
 ### Group Invite Viral Loop
 
@@ -154,6 +198,57 @@ Register for Airalo affiliate program before Phase 4 ends — approval takes a f
 - **Total: ~$19,600/yr** — covers Claude API costs; validates model before paid acquisition
 
 ---
+
+## Go-To-Market Strategy (Post-Launch)
+
+### First 90 Days — Organic Only
+
+**Do NOT run paid acquisition in the first 90 days.** At $29.99/yr, industry CAC of $30–200/subscriber makes paid channels break-even to negative LTV. All budget goes to organic until pricing is validated.
+
+### Priority Channel Ranking
+
+**1. Setapp Distribution (apply Week 1)**
+Setapp is a Mac/iOS app subscription bundle — users pay $9.99/month and get access to 240+ apps. Tripsy is already on it. Accepted apps get passive discovery from 300K+ power users who are already subscription-comfortable and Apple-native. No CAC. Apply at setapp.com/developers. Acceptance typically takes 2–4 weeks.
+
+**2. Reddit Communities (authentic, not promotional)**
+Target: r/solotravel (7M members), r/digitalnomad (2M members), r/travel (7M members).
+- Do NOT post "check out my app" — this gets removed and damages reputation
+- Reply to existing threads where people ask about Schengen tracking, trip organization, entry requirements
+- Provide genuine value first; mention the app naturally when directly relevant
+- A single helpful reply in r/solotravel can drive 50–200 installs if it surfaces in Google search results (Reddit ranks highly)
+- See Reddit post templates below
+
+**3. Apple Editorial Pitch**
+Apple's App Store editorial team features apps in "Apps We Love," "Best New Apps," and curated collections. You can pitch them directly via App Store Connect → App Information → App Store Promotion. The angle: Roam Wyld is the only iOS app with a Schengen tracker at the moment EES (EU Entry/Exit System) went live in April 2026, making compliance tracking newly critical for all non-EU travelers to Europe. This is a news hook Apple editors recognize. Keep the pitch to 2–3 sentences and one compelling screenshot.
+
+**4. Content SEO — Schengen Landing Pages**
+Publish 3–5 pages on roamwyld.app targeting searches users make while researching the exact problem Roam Wyld solves. Google indexes these; they drive installs 6–12 months after publishing. Start with:
+- "Schengen 90/180 day rule explained" — high search volume, low competition
+- "How to track Schengen days" — intent matches exactly what the app does
+- "Entry requirements for [Japan/Thailand/Indonesia]" — destination-specific, matches traveler research phase
+- "How to organize a multi-country Europe trip" — top of funnel
+
+You don't need a blog platform — simple HTML pages on roamwyld.app with good meta descriptions are enough to index. 500–800 words per page.
+
+**5. Summer Launch Messaging (July 2026)**
+The app launches while people are actively traveling, not planning. Adjust all messaging to:
+- "Works when you land, even without a SIM card" (not "plan your next trip")
+- "Check your entry requirements right now, for free" (immediate utility)
+- "Your Schengen days, calculated instantly" (solves an active problem)
+January 2027 is the highest-intent planning window — build community and content now so you're established when that surge hits.
+
+### Reddit Post Templates
+
+**Template 1 — Reply to "how do I track Schengen days" threads:**
+> The 90/180 rule is genuinely confusing because the window rolls daily, not by calendar month. I've been using Roam Wyld (free iOS app) which has a Schengen tracker built in — you input your entry/exit dates and it shows exactly how many days you have remaining. Saves me from running the math in my head every time I cross a border. [No affiliation, just find it useful]
+
+**Template 2 — Reply to "what app do you use for multi-country trips" threads:**
+> Depends what you need. For pure itinerary organization Tripsy looks beautiful. But for international trips where I actually need to know visa requirements and entry rules for each country, I switched to Roam Wyld — it has per-passport entry requirements cached offline so they work without data, plus a Schengen tracker. It's free for the core stuff. Not perfect but fills a gap the prettier apps don't touch.
+
+**Template 3 — Reply to "app that works offline in remote areas" threads:**
+> Roam Wyld is offline-first — your itinerary, entry requirements, emergency contacts, and currency data are all cached locally. I tested it in airplane mode before a Japan trip and everything was there. The Gmail import is the Pro feature but the offline stuff is free.
+
+**Note on Reddit posting:** Use your personal account, not a brand account. Post from your genuine experience as a traveler who built this for her honeymoon — that's authentic and the r/solotravel community responds well to founder stories. Don't post more than once per week per subreddit or you'll trigger spam filters.
 
 ## Risk Register
 

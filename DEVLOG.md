@@ -6,6 +6,144 @@ Built by Kirsten Evans (Product Manager) using Claude Code.
 
 ---
 
+## Session 15 — Apple Rejection Response + Free v1.0 Monetization Pivot (June 30, 2026)
+
+**Context:** This session was driven by an Apple App Store rejection received on June 30, 2026 — the day of the original deadline — and a strategic decision to pivot v1.0 to fully free. Priority context: the app needs to be live and working for Kirsten's honeymoon trip.
+
+### Apple Rejection — Two Guidelines
+
+**Guideline 3.1.2(c) — Subscription Disclosure:**
+Apple flagged that the paywall did not contain functional links to Terms of Service and Privacy Policy — they were plain text. Fixed by adding tappable `<Text onPress={Linking.openURL()}>` spans for both links in `PaywallModal.tsx`. Both URLs point to `roamwyld.app/terms.html` and `roamwyld.app/privacy.html`.
+
+**Guideline 2.1(b) — In-App Purchases Not Found:**
+Apple reviewers couldn't locate the IAP products during sandbox review. Root causes identified:
+1. Paid Apps Agreement not signed in App Store Connect (blocks all sandbox IAP)
+2. Test account `roam.wyld1@gmail.com` had Pro access via `beta_access` table — Apple reviewer likely logged in as Pro and never hit the paywall
+3. RevenueCat offerings not configured in dashboard — `getOfferings()` was returning null
+4. Apple didn't know the paywall path (Gmail Import button inside a trip)
+
+Actions taken: Removed Pro access from test account via Supabase SQL. Identified that only Gmail Import gates the paywall (directions feature was already cut from v1.0). Entry Requirements was listed in paywall UI but not actually code-gated.
+
+### Strategic Decision: Free v1.0 Launch
+
+**Decision:** Set `ALL_FREE = true` in `useProAccess.ts` — all features free for v1.0. Pro monetization deferred to v1.1.
+
+**Consulted:** Product Executive agent + User Researcher agent (run in parallel).
+
+**Product Executive verdict:** Go free unambiguously. Zero users = zero revenue risk. Gmail Import free in v1.0 is a growth lever, not a giveaway. The savings curve concern ("trains users to expect free") doesn't apply with no brand equity yet. Time to live is the most important metric.
+
+**User Researcher verdict:** The danger isn't going free — it's the free-to-paid transition. Travel users are high-stress during trip planning, the worst time to introduce a paywall. Recommended: add "Coming in Pro" labeling during v1.0 to prime conversion. Track bookings per trip (6+ = paywall candidate), Gmail Import usage rate, session frequency.
+
+### Competitive Analysis: Free vs. Paid in Travel Apps
+
+| App | Price | What's Free | Killer Pro Feature |
+|---|---|---|---|
+| TripIt | $49/yr | Email forwarding, basic itinerary | Real-time flight disruption alerts |
+| Wanderlog | $39.99/yr | Unlimited planning + collaboration | **Gmail auto-scan (explicitly paid)** |
+| Roadtrippers | $29.99/yr | Basic routes (7 waypoint cap) | Cap removal + offline maps |
+| TravelSpend | ~$19.99/yr | 1 active trip | Unlimited trips + cloud sync |
+| PackPoint | $2.99 one-time | Basic packing lists | TripIt integration + list sharing |
+
+**Key finding:** Gmail Import is explicitly a paid feature at Wanderlog. It's the right v1.1 Pro anchor. Everything else Roam Wyld offers (visa rules, currency, emergency info, manual booking) is expected free across all competitors.
+
+**v1.1 Pro strategy:** Gmail Import only. One clear feature that earns its price is stronger than three weak gates.
+
+### Grandfathering Architecture (v1.1 Plan)
+
+Anyone who signs up during the free launch month will be grandfathered into Pro forever. Implementation uses the existing `beta_access` table (`expires_at = null` = never expires).
+
+At v1.1 Pro launch, run one SQL migration:
+```sql
+INSERT INTO public.beta_access (user_id, granted_by, expires_at, notes)
+SELECT id, 'auto:founder-cohort', null, 'Grandfathered — signed up during free launch month'
+FROM auth.users
+WHERE created_at < '2026-08-01T00:00:00Z'
+ON CONFLICT (user_id) DO NOTHING;
+```
+
+Then set `ALL_FREE = false`, configure RevenueCat offerings, sign Paid Apps Agreement, and submit v1.1 update. New users see the paywall; founding cohort never does.
+
+### Code Changes (June 30, 2026)
+
+**`src/hooks/useProAccess.ts`:**
+- Added `ALL_FREE = true` constant — when true, all users return `isPro: true` instantly, skipping Supabase and RevenueCat checks entirely
+- Comment documents intent: "Flip to false when Pro monetization is ready"
+
+**`src/screens/PaywallModal.tsx`:**
+- Added `Linking` import
+- Added `PRIVACY_URL` and `TERMS_URL` constants pointing to `roamwyld.app`
+- Made "Terms of Service" and "Privacy Policy" in legal copy tappable underlined links (resolves Apple 3.1.2(c))
+
+### Website Changes (June 30, 2026)
+
+**`website/index.html`:** Removed entire pricing section (Free/Pro cards), removed "Pro from $4.99/mo" from hero tagline (now "iOS · Free"), changed Gmail Import badge from "Pro" to "Free", removed Pricing from nav and footer, updated FAQ Gmail answer to remove "With a Pro subscription."
+
+**`website/faq.html`:** Updated "Is Roam Wyld free?" answer to reflect all-free, removed "With a Pro subscription" from Gmail answer, removed entire "Subscription & Billing" section (free trial, cancel, restore, family plan), removed Pricing nav/footer links.
+
+**`website/support.html`:** Removed "(Pro)" labels from Gmail Import and AI Transit Directions headings, removed subscription troubleshooting entry, removed Pricing nav/footer links.
+
+**`website/terms.html`:** Removed entire Subscriptions section ($4.99/mo, $29.99/yr, free trial, auto-renewal, cancellation, price changes). Updated last modified date to June 30, 2026.
+
+**`website/privacy.html`:** Updated Apple/RevenueCat section to reflect that billing is future-state, not current.
+
+### Effort Comparison: Fix vs. Remove
+
+| Area | Approach | Effort | Status |
+|---|---|---|---|
+| PaywallModal.tsx | Fix (tappable links added) | 15 min | ✅ Done |
+| useProAccess.ts | Fix (ALL_FREE flag) | 5 min | ✅ Done |
+| Website (6 files) | Fix (content updates) | ~80 min | ✅ Done |
+| Lock icons in TripDetailScreen/TripScreen | Pending cleanup | ~30 min | Deferred |
+| PaywallModal delete | Pending | 10 min | Deferred |
+| InviteProScreen cleanup | Pending | 15 min | Deferred |
+| TodayScreen trial banner | Pending | 10 min | Deferred |
+| ProfileScreen Restore Purchases | Pending | 10 min | Deferred |
+
+Code cleanup (lock icons, dead paywall renders) deferred — `ALL_FREE = true` makes them unreachable at runtime. Will clean up in same PR as v1.1 Pro reactivation.
+
+### Outstanding for Apple Resubmission
+- [ ] Sign Paid Apps Agreement in App Store Connect → Business → Agreements
+- [ ] Reply to Apple's 2.1(b) message with paywall navigation steps
+- [ ] Submit new build with PaywallModal link fix
+- [ ] Push website changes to RoamWyld-legal repo (live at roamwyld.app)
+
+### Priority Note
+App must be live and working before Kirsten's honeymoon. All blocking Apple issues addressed. Next: submit new build.
+
+---
+
+## Session 14 — Website, Legal, and Post-Submission Polish (June 26, 2026)
+
+### What Was Done
+
+**roamwyld.app full redesign:**
+- Replaced placeholder screenshot box with real App Store screenshots (Discover Tokyo center, Entry Requirements + Currency flanking)
+- Removed all emoji icons from feature cards
+- Removed AI Transit Directions feature card (feature cut from v1.0)
+- All CTAs switched from broken mailto links → simple `mailto:support@roamwyld.app?subject=Roam Wyld Beta Access` buttons (opens Mail app directly)
+- Updated status: "Coming June 2026" → "Now in App Store Review" across banner, badge, hero
+- Founder section updated to past tense; timeline removed
+- Color scheme: blue/purple (#5B6AF0, #7C3AED) → amber/gold (#D97706, #FCD34D) to match app icon
+- App icon (sunflower compass) added to nav and footer; set as favicon
+- Social sharing og:image set to Discover screenshot
+- Pricing grid centered on wide screens
+
+**Legal — privacy.html and terms.html fully updated:**
+- Privacy: added Travel Profile, Insurance Details, Travel Companions sections (all were undisclosed); fixed Gmail body text accuracy; removed transit directions from Anthropic + Mapbox entries; added data retention table; added CCPA "do not sell" statement; contact updated to support@roamwyld.app
+- Terms: fixed email body vs metadata contradiction (was rejectable by Google OAuth + Apple); removed transit directions from service description; added full Subscription section (auto-renewal, 14-day trial, Apple billing, cancellation instructions); added third-party provider liability exclusion; governing law: Colorado; contact updated to support@roamwyld.app
+- Both reviewed by legal-privacy agent and app-store-specialist agent before publishing
+
+**Bug fixed:** nav icon rendering at 1024×1024 natural size (blew up the entire layout) — fixed with inline `width:28px;height:28px` style
+
+**All changes live at roamwyld.app via RoamWyld-legal GitHub Pages repo.**
+
+### Key Decisions
+- Beta signup: chose mailto deeplink over Formspree — simpler, no JS dependency, works natively on mobile
+- No Formspree account needed; emails go directly to support@roamwyld.app
+- Governing law: Colorado (Kirsten's state of residence)
+
+---
+
 ## 🚀 APP STORE SUBMITTED — June 25, 2026
 
 **Roam Wyld v1.0 submitted to Apple App Store review at 10:35 AM MT on June 25, 2026. 5 days ahead of the June 30 deadline.**
@@ -1485,3 +1623,63 @@ Claude Code (implementation), Supabase (backend + Edge Functions), Expo Go (devi
 
 **Why a build log?**
 This log exists to show the full product lifecycle: decisions made, tradeoffs chosen, problems encountered, feedback incorporated. The code shows what was built. This shows how.
+
+---
+
+## Session — 2026-06-29 | Test Suite + Beta Infrastructure
+
+### What Was Built
+
+**699-test regression suite (29 suites) — established as the official baseline**
+
+Built a comprehensive Jest test suite covering all testable source files in the app. This is the regression floor: test count must never drop below 699, new code must add new tests.
+
+Files covered:
+- All cache modules: `currencyCache`, `emergencyCache`, `insuranceCache`, `tripCache`, `userPrefs`, `db` (content cache + TTL)
+- All services: `trips`, `bookings`, `insurance`, `insuranceImport`, `validation`, `exchangeRates`, `exchangeRatesLive`, `affiliates`, `gmailImport`, `transitDirections`
+- All utilities: `destinationFormat`, `mapsQuery`
+- All static data files: `currencyTipping`, `emergencyInfo`, `languageBasics`, `entryRequirements`, `creditCardBenefits`
+- Cross-module: `dataIntegrity.test.ts` (49 tests verifying data consistency across modules), `contracts.test.ts` (schema contracts), `bugFixes.test.ts` (regression tests for known bugs)
+
+**3 real production bugs found and fixed during test authoring:**
+
+| Bug | File | Fix |
+|-----|------|-----|
+| `WHERE country_code IN ()` SQLite crash on empty array | `currencyCache.ts`, `emergencyCache.ts` | Added `if (destinations.length === 0) return []` guard |
+| `checkFlight` missing `res.ok` check | `services/validation.ts` | Added `if (!res.ok) return { status: 'skipped' }` (checkHotel already had this) |
+| `null` destinations from server not normalized to `[]` | `services/trips.ts` | Added `.map(t => ({ ...t, destinations: t.destinations ?? [] }))` |
+
+**travelScore — previously untested scoring engine**
+
+`travelScore()` in `gmailImport.ts` had a placeholder test that literally just checked two unrelated functions existed. Exported the function and replaced with 18 targeted tests covering all 4 scoring tiers (domain match +10, booking phrases +4, action words +2, context words +1), isolation of single-signal inputs, stacking behavior, and combined scoring.
+
+**Beta whitelist with auto-grant trigger (migration 012)**
+
+Added `beta_whitelist` table + `grant_beta_access_on_signup()` trigger on `auth.users`. When a new user signs up with a pre-approved email, their UUID is automatically inserted into `beta_access` — no manual step needed. Pre-populated with Alvaro Caicedo and Syed Mahmood.
+
+To add future beta testers: Supabase Dashboard → `beta_whitelist` → Insert Row with their email. Zero code changes required per tester.
+
+**CLAUDE.md regression rule**
+
+Added mandatory two-step protocol after every code change:
+1. `npx jest --no-coverage` — all 699+ tests must pass
+2. `qa-engineer` subagent review of changed files
+
+Scrum master is responsible for triggering both. Neither substitutes for the other.
+
+### Key Decisions
+
+**699 is the floor, not the ceiling.** Deleted tests must be replaced. New code must add tests. The count only goes up.
+
+**Beta access via Supabase trigger, not RevenueCat.** RevenueCat uses Supabase UUID as user ID — can't pre-grant by email. The existing `beta_access` table (already checked by `useProAccess`) is the right layer. Trigger handles the UUID lookup automatically at signup. No app code change needed.
+
+**Don't add `@testing-library/react-native`.** Both hooks (`useAppStateRefresh`, `useProAccess`) are thin orchestrators — the business logic they call is already tested. RNTL would buy hook wiring tests at the cost of significant dependency risk on a June 30 deadline.
+
+### Commits
+- `6d8c5c1` — feat(tests): 699-test regression suite + real bug fixes
+- `6101565` — feat(beta): email whitelist with auto-grant trigger
+
+### Outstanding
+- App Store review in progress — waiting on approval before pushing next build
+- Beta testers (Alvaro Caicedo, Syed Mahmood) will be auto-granted Pro on signup once migration 012 is applied to production Supabase
+- Device-level gaps not coverable by Jest: RevenueCat/StoreKit sandbox, AppState timing, Keychain, push notifications, deep links — need manual smoke test on real device before submission

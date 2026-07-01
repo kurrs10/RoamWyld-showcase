@@ -48,6 +48,7 @@ Features are scored on two axes: **traveler value** (how much it matters to the 
 | Expense splitting | Medium | Medium | 4 |
 | Packing list (AI-generated) | Medium | Medium | v1.1 |
 | Weather (cached) | Low | Low | v1.1 |
+| Per-trip budgeting | Medium | Medium | v1.1 |
 | Visa tracker | Medium | Medium | 4 |
 | Analytics (PostHog) | Internal | Low | 5 |
 | Error monitoring (Sentry) | Internal | Low | 5 |
@@ -147,7 +148,7 @@ These features are individually lower complexity but collectively eliminate Goog
    - **Wise** (currency) — sign up at wise.com/partners; surface link on currency/tipping screen; add `getWiseLink()` to affiliates.ts
    - **iVisa** (visa assistance) — sign up at partners.ivisa.com; surface link on entry requirements screen when a visa is required; add `getIVisaLink(countryCode)` to affiliates.ts
 
-> **Deferred to v1.1:** Expense splitting, visa tracker, weather, packing list
+> **Deferred to v1.1:** Expense splitting, visa tracker, weather, packing list, per-trip budgeting
 
 ### Definition of done
 - Emergency info, currency/tipping, and language basics work in airplane mode
@@ -211,8 +212,92 @@ If Phase 3 runs long, these are the safe cuts that don't break the core experien
 | PDF upload | Medium — email import covers most users | Post-launch v1.1 |
 | Storybook | Internal only | Post-launch |
 | Both/Split/Free time modes | Medium — can default to shared view | Post-launch v1.1 |
+| Per-trip budgeting | Low — not a travel-safety feature | v1.1 |
+| **Real-time flight alerts** | **HIGH — eliminates the #1 reason users run a second app (TripIt/CheckMyTrip) alongside Roam Wyld; gate changes, delays, cancellations** | **v1.1 — TOP PRIORITY** |
+| Trip cover photos per trip | High — closes Tripsy aesthetic gap; single biggest UI differentiator; users open Tripsy just to look at their trip | v1.1 |
+| Push notifications via Firebase (FCM) | Required for flight alerts; also enables trip reminders + re-engagement nudges ("Your flight to Tokyo is tomorrow") | v1.1 (prerequisite for flight alerts) |
+| Expense tracking | Medium — Tripsy's most-praised non-core feature; multi-currency ledger per trip | v1.1 |
+| PDF itinerary export | Medium — appears in Tripsy complaints, zero competitors have it, differentiates in feature comparisons | v1.1 |
+| Vertex AI / Gemini vs. Anthropic benchmark | Cost optimization — benchmark after first month of real usage data; Gemini Flash may be cheaper for Gmail parsing at scale; only migrate if cost delta justifies the switch | After month 1 of production usage |
+| Pricing evaluation | Evaluate at 30/60/90/120 days post-launch: trial-to-paid conversion, annual vs monthly split, churn, review sentiment. Research indicates potential to raise from $29.99 to $39.99/yr after data validates — do NOT change before 90-day checkpoint | 30/60/90/120 day reviews |
 
 **Never cut:** Offline caching, transit directions, entry requirements, booking validation. These are the core promise of the app.
+
+---
+
+## Post-Submission — Full Test Suite (While Apple Reviews)
+
+Apple's review window (typically 1–3 days, up to 7) is the right time to build the full test suite. The app is in its production shape, there is no submission deadline pressure, and any bugs caught feed directly into v1.0.1.
+
+**Prerequisites (run once before starting):**
+```
+npm install --save-dev jest-expo @types/jest @testing-library/react-native @testing-library/jest-native detox
+```
+
+---
+
+### Layer 1 — Infrastructure (already done: June 16)
+- [x] `jest.config.js` with `jest-expo` preset and `transformIgnorePatterns`
+- [x] Module mocks: `react-native-purchases`, `@sentry/react-native`, `posthog-react-native`
+- [x] `jest-expo` and `@types/jest` added to `package.json` devDependencies
+- [x] Pure utility extraction: `src/lib/trialUtils.ts`, `src/lib/proUtils.ts`
+
+### Layer 2 — Unit Tests (already done: June 16) — ~30 cases
+- [x] `affiliates.test.ts` — 20 cases covering all link-builder functions: country lookup, case normalization, fallback, affiliate ID injection, regional routing, SafetyWing hardcoded ID, Wise fallback, iVisa country-code lowercasing
+- [x] `trialUtils.test.ts` — 8 cases: trigger window (days 10–13), pre-trigger (days 0–9), post-expiry (day 14+), Pro/beta/hasTrips guards, deterministic `now` injection, constants assertion
+- [x] `proUtils.test.ts` — 5 cases: active entitlement, empty active map, wrong entitlement name, undefined value, constant name assertion vs. PaywallModal
+
+### Layer 3 — Component Tests (post-submission) — ~40 cases
+Requires `@testing-library/react-native`. Target these screens in priority order:
+
+1. **PaywallModal** — 7 states:
+   - Loading spinner visible while `loadingOffers: true`
+   - Error box + retry button when `offersError: true`
+   - Error detail text rendered (confirms diagnostic channel not gated)
+   - Annual pill selected by default
+   - Monthly pill switches `selectedPlan`
+   - "Unlock [featureName] and everything else Pro offers" when `featureName` prop is passed
+   - "Everything you need for your next adventure." when `featureName` is omitted
+
+2. **TodayScreen trial banner** — 4 states:
+   - Banner visible at day 11 for non-Pro user with no trips
+   - Banner hidden for Pro user
+   - Banner hidden when user has trips
+   - Banner hidden after AsyncStorage dismissal key is set
+
+3. **CurrencyScreen Spend Smart card** — 4 states:
+   - Card renders collapsed by default
+   - Tapping header expands the tips table
+   - "Spending money in [country]" when `activeCountry` is set
+   - "Get a Wise card →" CTA renders; tapping calls `Linking.openURL`
+
+4. **InviteProScreen** — 3 states:
+   - `featureName` passed as "Transit Directions" to PaywallModal
+   - Share button visible
+   - Copy renders correctly
+
+### Layer 4 — E2E with Detox (post-submission) — ~12 scenarios
+Requires a Detox build profile in `eas.json` (internal distribution, `testEnvironment: true`).
+
+**Critical path scenarios (priority order):**
+1. Onboarding: cold launch → create account → land on TodayScreen
+2. Trip creation: TodayScreen → create trip → add 2 destinations → confirm timeline renders
+3. Paywall trigger: navigate to transit directions → confirm paywall appears for free user
+4. Purchase flow (sandbox): accept paywall → confirm Pro state (entitlement active)
+5. Restore purchases: Pro user logs in on second device → restore → Pro state confirmed
+6. Invite flow: share invite link → accept link on same device → InviteAcceptScreen renders
+7. Gmail import: connect Gmail → import one booking → confirm booking appears in timeline
+8. Offline mode: create trip → enable airplane mode → confirm TripDetailScreen loads from cache
+9. Entry requirements: trip with Japan destination → entry requirements tab → US passport rules visible
+10. Account deletion: Profile → Delete Account → confirm Supabase auth row removed
+11. Currency screen: navigate → Spend Smart card visible → expand → Wise CTA tappable
+12. Deep link: open `roamwyld://invite/test-code` → InviteAcceptScreen renders
+
+**Detox setup steps (do once):**
+1. `npm install --save-dev detox @config-plugins/detox`
+2. Add `"e2e"` build profile to `eas.json`: `{ "distribution": "internal", "ios": { "simulator": true } }`
+3. Add `detox.config.js` pointing to the `e2e` build artifact
+4. Add `.detoxrc.js` and `e2e/` directory
 
 ---
 
