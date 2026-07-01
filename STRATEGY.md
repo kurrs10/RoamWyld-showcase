@@ -29,7 +29,7 @@ Individually, partial versions exist (Rome2Rio for routing, Sherpa for visa info
 | AI features | None | Generic suggestions | None | None | Generation only | Cached, itinerary-tied |
 | Group mode | Basic sharing | Strong collaboration | None | None | None | Yes (color-coded) |
 | App Store rating | ~4.8 ★ | ~4.7 ★ | ~4.2 ★ | ~4.5 ★ | Varies | Target 4.5+ |
-| Pricing | $49/yr | ~$30/yr | Free | Free | Free/varies | $24.99/yr |
+| Pricing | $49/yr | $39.99/yr | Free | Free | Free/varies | $24.99/yr |
 
 ### Pre-Launch Competitive Verification Checklist
 

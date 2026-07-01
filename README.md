@@ -127,9 +127,9 @@ See [DEVLOG.md](DEVLOG.md) for the full build log with decisions, tradeoffs, and
 
 ## Monetization
 
-**Roam Wyld Free:** Trip & booking management, entry requirements, currency converter, emergency info, flight validation, offline access.
+**v1.0 — Fully free.** All features included at no cost: trip management, Gmail booking import, entry requirements, currency converter, emergency info, flight validation, offline access.
 
-**Roam Wyld Pro — $4.99/mo · $29.99/yr:** AI transit directions, Gmail booking import, unlimited trips, priority support. 14-day free trial on both plans.
+**v1.1 — Pro tier planned.** Gmail Import will move behind a Pro subscription ($4.99/mo or $29.99/yr). All users who sign up during v1.0 will be permanently grandfathered into Pro — no charge, ever. The `beta_access` table in Supabase handles this automatically at launch via a single SQL migration.
 
 ---
 

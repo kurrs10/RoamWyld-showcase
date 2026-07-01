@@ -4,6 +4,64 @@ A record of the significant product decisions made during the build: what was ch
 
 ---
 
+## Monetization Decisions
+
+### v1.0 Launch: 100% Free (June 30, 2026)
+**Decision:** Launch v1.0 with all features free. No paywall, no in-app purchases, no subscription. `ALL_FREE = true` flag in `useProAccess.ts` grants all users Pro access at launch.
+**Rejected:** Launching with a $4.99/mo paywall gating Gmail Import.
+**Why — strategic:**
+- App Store rejection forced the evaluation (Guideline 2.1(b): Apple couldn't find IAPs; Guideline 3.1.2(c): missing functional links in paywall). Fixing RevenueCat + IAP configuration was possible but introduced risk and delay.
+- Zero users = zero revenue risk. Time to live was the most important metric given a deadline of June 30 and the honeymoon use case.
+- Gmail Import free in v1.0 is a growth lever, not a giveaway. Users who get hooked during the free period are stronger v1.1 conversion candidates than cold users hitting a paywall.
+- Competitive analysis of TripIt, Wanderlog, Roadtrippers, TravelSpend, PackPoint confirmed: manual booking, entry requirements, currency, and emergency info are all expected free. Gmail Import (email auto-scan) is the one feature competitors monetize. Wanderlog charges $39.99/yr for it explicitly.
+
+**Why — user psychology:**
+- User research finding: free-to-paid transitions cause user backlash not because of price but because of perceived loss. Travel users are highest-stress during trip planning — introducing a paywall mid-planning cycle is the worst UX moment. Free launch with clear "founding cohort" messaging sets the right expectation for v1.1.
+- Users with 6+ bookings per trip are the highest conversion candidates. v1.0 lets those users be identified organically before any paywall appears.
+
+**Metrics to track in v1.0 before Pro launch:**
+- Bookings entered per trip (target cohort: 6+)
+- Gmail Import tap and usage rate
+- Session frequency during active trip planning
+- D7, D30, D90 retention
+
+---
+
+### v1.1 Pro Strategy: Gmail Import Only
+**Decision:** When monetization launches in v1.1, gate only Gmail Import behind Pro. All other features remain free.
+**Rejected:** Gating entry requirements, transit directions, or multiple features simultaneously.
+**Why:** One clear Pro feature that demonstrably saves time is more persuasive than a feature list. Gmail Import is the right choice because:
+- Competitors charge for it (Wanderlog $39.99/yr, TripIt smart version)
+- It replaces obvious manual effort (copying 15+ confirmation emails by hand)
+- Users become dependent on it after one use — creates natural upgrade pressure
+- Everything else Roam Wyld offers is expected free across all competitors
+
+**v1.1 Pro pricing (planned):** $4.99/mo or $29.99/yr (50% savings). Revisit after v1.0 data.
+
+---
+
+### Grandfathering: Founding Cohort Gets Pro Forever
+**Decision:** All users who sign up during the free v1.0 launch window (before v1.1 Pro activation) will be permanently grandfathered into Pro — never charged, access never expires.
+**Rejected:** Retroactively applying the paywall to existing free users when v1.1 launches.
+**Why:**
+- Grandfathering is a loyalty signal. Early adopters take a risk on an unproven product. Rewarding them with lifetime Pro access is appropriate and creates strong word-of-mouth.
+- Psychological contract: users who signed up when it was free shouldn't be surprised by a paywall on their next trip. Grandfathering honors the implicit promise of the free launch.
+- Implementation is architecturally free — the `beta_access` table already supports `expires_at = null` (never expires). One SQL migration at v1.1 launch grandfathers the full founding cohort with no app update required.
+
+**Scaling architecture:**
+```sql
+-- Run at v1.1 Pro launch date
+INSERT INTO public.beta_access (user_id, granted_by, expires_at, notes)
+SELECT id, 'auto:founder-cohort', null, 'Grandfathered — signed up during free launch month'
+FROM auth.users
+WHERE created_at < '2026-08-01T00:00:00Z'  -- update to actual Pro launch date
+ON CONFLICT (user_id) DO NOTHING;
+```
+
+After this runs: set `ALL_FREE = false`, configure RevenueCat offerings, submit v1.1. New signups see the paywall. Founding cohort's `isPro` check hits the Supabase `beta_access` table first and returns true — they never see RevenueCat.
+
+---
+
 ## Architecture Decisions
 
 ### Offline-First vs. Sync-on-Demand
