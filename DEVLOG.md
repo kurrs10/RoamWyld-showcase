@@ -6,6 +6,53 @@ Built by Kirsten Evans (Product Manager) using Claude Code.
 
 ---
 
+## Session 16 — PO + UX Edge Case Pass: All 12 Screens (July 3–4, 2026)
+
+**Context:** Applied 110 PO and UX edge case fixes (71 EC + 39 UX) across every screen in the app. Ran full Jest suite (699/29) after every change. QA agent found and corrected 3 MAJORs before session close.
+
+### Screens Updated
+
+All 12 app screens received their full set of fixes this session (some were already partially done in prior sessions):
+
+| Screen | Key fixes |
+|---|---|
+| TodayScreen | Already complete from prior session |
+| TripListScreen | EC-007/009/013, UX-011 — minimumDate, booking count hide, discard alert, date display |
+| TripScreen | Network error detection in saveTrip, emoji removed from all alert titles, bookings empty state CTA |
+| TripDetailScreen | Same; plus MAJOR fix: hotel check_out pre-populates to start+1d on same-day trips |
+| DiscoverScreen | EC-031–036, UX-022–024 — already complete |
+| EmergencyScreen | EC-043–047, UX-001/028/029/031 — loading padding, tabs, call error, empty state CTA |
+| InsuranceScreen | EC-048–054, UX-001/032/033/034 — DateTimePicker, Ionicons, saved banner, card search empty state |
+| ProfileScreen | EC-055–058, EC-072 — loadError UI, discard alert, isOtherPassport state, sign-out Gmail context |
+| LoginScreen | EC-061–065, UX-037 — inline validation, error routing, sign-up confirmation, forgot password modal, Ionicons eye |
+| CurrencyScreen | EC-037–042, UX-001/004/005/025/026/027 — offline banner, empty state card, ActionSheet picker, Ionicons |
+| InviteAcceptScreen | EC-066–069 — timeout, sign-in CTA, network error, ownerName pass |
+| InviteProScreen | EC-070–071 — navigation fix, features rewrite |
+
+### QA MAJORs Fixed
+
+1. **ProfileScreen** — `saveProfile` guard was `editPassport === 'Other'` (never true after UX refactor). Fixed to `isOtherPassport && !editPassport.trim()`. Blank custom passport can no longer be silently saved to DB.
+2. **LoginScreen** — Error routing used friendly string substring matching. "Incorrect email or password" was routing to email field; network errors were routing to password field. Fixed to route on original Supabase error message before localization.
+3. **TripDetailScreen** — Hotel booking form pre-populated `check_out = trip.end_date` which equals `check_in` on same-day trips, opening the form in an immediately-invalid state. Fixed: `check_out = end > start ? end : start + 1 day`.
+
+### Test Suite
+- **699 tests / 29 suites — all passing.** Baseline maintained throughout.
+
+### Business / Admin
+- D&B D-U-N-S application completed (EIN CP 575 + Articles of Organization submitted 2026-07-04)
+- TestFlight internal tester added (Build 15, internal testing group, by Apple ID)
+- Build 16 submitted to Apple; processing in ASC — needs to be attached to submission once it appears
+- Apple Developer entity type switch (Individual → Business) blocked until D-U-N-S number arrives from D&B
+
+### Outstanding
+- Build 16 in ASC → attach to submission → resubmit for App Store Review
+- D-U-N-S number from D&B (est. processing time varies; follow up if no response by 2026-07-10)
+- Apple Developer entity switch after D-U-N-S arrives
+- Google OAuth approval (submitted 2026-06-26, est. 4–6 weeks)
+- Friends TestFlight access + Setapp application — after App Store approval
+
+---
+
 ## Session 15 — Apple Rejection Response + Free v1.0 Monetization Pivot (June 30, 2026)
 
 **Context:** This session was driven by an Apple App Store rejection received on June 30, 2026 — the day of the original deadline — and a strategic decision to pivot v1.0 to fully free. Priority context: the app needs to be live and working for Kirsten's honeymoon trip.
