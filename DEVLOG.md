@@ -1730,3 +1730,61 @@ Scrum master is responsible for triggering both. Neither substitutes for the oth
 - App Store review in progress — waiting on approval before pushing next build
 - Beta testers (Alvaro Caicedo, Syed Mahmood) will be auto-granted Pro on signup once migration 012 is applied to production Supabase
 - Device-level gaps not coverable by Jest: RevenueCat/StoreKit sandbox, AppState timing, Keychain, push notifications, deep links — need manual smoke test on real device before submission
+
+---
+
+## Session — 2026-07-06 | Launch Day
+
+### App Store
+
+**v1.0 (Build 16) went live on the App Store — July 6, 2026.**
+URL: https://apps.apple.com/us/app/roam-wyld/id6774633699
+
+**v1.1 (Build 17) submitted for Apple review** same day, bundling Gmail improvements and screenshot reorder. Est. 24–48hr review.
+
+### Website — roamwyld.app
+
+All "Coming Soon" / "Beta Access" / "Early Access" copy replaced with live App Store download links across 7 locations in index.html. Three new pages added and pushed to `kurrs10/RoamWyld-legal`:
+
+| Page | URL | Purpose |
+|------|-----|---------|
+| Release Notes | roamwyld.app/release-notes | Version changelog (v1.0 launch, v1.1 Gmail improvements) |
+| Feedback & Features | roamwyld.app/feedback | Bug reports, feature requests, destination requests |
+| Compare | roamwyld.app/compare | Roam Wyld vs TripIt, Tripsy, Wanderlog feature table |
+
+All three linked in top nav (nav-link-hide — visible on desktop, collapses on mobile) and footer across all pages.
+
+### Gmail Import — v1.1 Changes
+
+Major rewrite of `src/services/gmailImport.ts`:
+- Added `in:anywhere` to both query strategies — now searches subfolders and custom labels
+- Expanded `KNOWN_TRAVEL_SENDERS` from ~30 to 80+ domains (international airlines: Singapore Air, Qantas, Emirates, Turkish, IndiGo, Garuda, Korean Air, JAL, ANA, Vietjet, AirAsia, Scoot; booking platforms: Agoda, Trip.com, Hopper, Omio, Trainline; car rentals: Sixt, Europcar; trains: Amtrak, Eurostar, Flixbus; cruises: Carnival, Royal Caribbean, NCL)
+- Dual-query strategy: keyword query + sender query run in parallel, deduplicated by message ID
+- Enriched emails increased from top 25 → top 50 by score + all known-sender emails regardless of score
+- Body limit increased 1500 → 4000 chars
+- Added `car_rental` as a valid booking type in Edge Function schema and Claude prompt
+- `max_tokens` in gmail-parse Edge Function increased 4096 → 8096
+
+### Business & Marketing
+
+- **Setapp developer application submitted** (2026-07-06) — response within 10 business days
+- **Instagram @roamwyldapp** account created; 9-tile grid mosaic prepared (1080×1080 tiles in Downloads/roamwyld_grid/); posts 1–6 of 9 completed
+- **Tester emails sent** to beta list
+
+### Key Decisions
+
+**Bundled v1.1 instead of separate builds.** Rather than submitting one build for screenshot reorder and a second for Gmail improvements, both were bundled into Build 17 to conserve EAS build credits (at 100% for the month; reset July 11).
+
+**Screenshot reorder requires new version.** Apple locks screenshots on released builds. Confirmed v1.1 in App Store Connect is the correct path.
+
+**Wanderlog added to compare page instead of TripCase.** Wanderlog is the strongest current direct competitor (widely searched, free tier, multi-destination). TripCase is declining. Compare page includes honest credit for Wanderlog's strengths (Google Maps integration, solid itinerary builder) while highlighting Roam Wyld's differentiators (entry requirements, offline, Gmail import, emergency numbers).
+
+### Outstanding
+
+- Wait for Apple v1.1 approval (~24–48hr) before LinkedIn post
+- Post Instagram tiles POST_07, POST_08, POST_09 (POST_01–06 done; paused for verification)
+- Set up "Send mail as" support@roamwyld.app — create real mailbox in Namecheap cPanel first
+- Add friends as external TestFlight beta testers after v1.1 approval
+- Update Apple Developer account Individual → Business (blocked on D-U-N-S from D&B, applied 2026-07-04)
+- Reapply to Airalo affiliate program (app now live)
+- Reddit posts (r/solotravel, r/travel, r/digitalnomad)
