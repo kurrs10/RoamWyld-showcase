@@ -92,25 +92,28 @@ Before finalizing App Store copy, verify live:
 
 ### Tier Structure
 
-**Roam Wyld Free (permanent)**
-- 1 active trip at a time
-- Manual entry + email import
-- Booking validation (flights + hotels)
-- Entry requirements and passport checklist
-- Emergency info, language basics, currency (all offline)
-- Basic push alerts (flight/hotel reminders)
-- Transit directions: **first trip free** (conversion mechanic)
+**v1.0 — Fully Free (launched June 30, 2026)**
 
-**Roam Wyld Pro — $14.99/year or $1.99/month (launch pricing)**
+Everything is free for the founding cohort. No trial, no paywall, no expiration.
+
 - Unlimited trips
-- All transit directions (Claude AI, cached offline)
-- Group/couple mode (trip creator; invitees view free — keeps viral loop intact)
-- Schengen tracker with proactive alerts
-- AI free-time suggestions (pre-cached offline)
-- Travel insurance storage + contextual surfacing
-- Airalo eSIM recommendations (affiliate-linked, country pre-filtered)
-- Expense splitting (v1.1)
-- AI packing list (v1.1)
+- Manual booking entry (flights, hotels, activities)
+- Gmail booking import (AI-parsed)
+- Booking validation — flights (AviationStack) + hotels (Google Places)
+- Step-by-step AI transit directions (cached offline)
+- Entry requirements + Schengen tracker (per passport, offline)
+- Emergency info, language basics, currency (all offline)
+- Travel insurance storage
+- PostHog analytics + Sentry error monitoring
+
+**v1.4 — Pro Tier (planned Q4 2026)**
+
+All founding cohort users (signed up before Pro launch) are permanently grandfathered — no charge, no expiration.
+
+- **Pro gate:** Gmail Import only — everything else stays free forever
+- **Pricing:** $4.99/month · $29.99/year
+- **Free trial:** 14 days
+- **Pricing rationale:** Wanderlog charges $39.99/yr for Gmail import; TripIt charges for smart parsing. Roam Wyld gates one feature, stays below both competitors, and lets all companion features (entry requirements, emergency info, offline access) remain free permanently.
 
 ### Pricing Strategy
 
@@ -157,10 +160,6 @@ This is the primary organic acquisition channel — every group trip is a free u
 3. User immediately gets full Pro access on next app open
 
 The `useProAccess()` hook in `src/hooks/useProAccess.ts` handles this transparently — Pro features unlock when a valid beta row exists, no different from a paid subscription from the user's perspective.
-
-### Conversion Mechanic
-
-Give free users one full transit direction set on their first trip, no credit card. The paywall hits on trip 2, after they've already experienced the feature. By then the "should I pay $14.99/year" question answers itself.
 
 ### Affiliate Revenue
 

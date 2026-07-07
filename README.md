@@ -3,7 +3,7 @@
 
 **Your trip. Any country. No WiFi needed.**
 
-> iOS travel companion app — shipping June 2026  
+> Live on the App Store — July 2026  
 > Built by [Kirsten Evans](https://www.kirstenmoberly.com), Product Manager
 
 ---
@@ -55,7 +55,7 @@ All critical content works without internet:
 - Currency + tipping guides
 - Language basics (30–40 phrases per destination, contextually surfaced)
 
-### Group / Couple Mode
+### Coming in v1.3 — Group / Couple Mode
 - Shared itinerary with color-coded traveler views
 - Per-person passport profiles and insurance storage
 - Group invite viral loop: share a trip link, invited traveler downloads the app and lands directly in the shared itinerary
@@ -129,7 +129,9 @@ See [DEVLOG.md](DEVLOG.md) for the full build log with decisions, tradeoffs, and
 
 **v1.0 — Fully free.** All features included at no cost: trip management, Gmail booking import, entry requirements, currency converter, emergency info, flight validation, offline access.
 
-**v1.1 — Pro tier planned.** Gmail Import will move behind a Pro subscription ($4.99/mo or $29.99/yr). All users who sign up during v1.0 will be permanently grandfathered into Pro — no charge, ever. The `beta_access` table in Supabase handles this automatically at launch via a single SQL migration.
+**v1.1 — Gmail import improvements shipped July 2026.** Expanded airline coverage (80+ carriers), itinerary email parsing, trash/spam exclusion, and improved scoring. All features remain free.
+
+**v1.4 — Pro monetization.** Gmail Import will move behind a Pro subscription ($4.99/mo or $29.99/yr). All users who signed up during v1.0 will be permanently grandfathered into Pro — no charge, ever.
 
 ---
 
@@ -138,10 +140,11 @@ See [DEVLOG.md](DEVLOG.md) for the full build log with decisions, tradeoffs, and
 - [x] Phase 1 — Foundation ✓
 - [x] Phase 2 — Import + Validation ✓
 - [x] Phase 3 — Differentiators ✓ (transit directions, entry requirements, offline caching)
-- [ ] Phase 4 — Companion Features (June 17–23)
-- [ ] Phase 5 — Polish + Launch (June 24–30)
-- [ ] TestFlight beta (target June 20)
-- [ ] App Store submission (target June 27)
+- [x] Phase 4 — Companion Features ✓ (emergency info, currency, language)
+- [x] Phase 5 — Polish + Launch ✓ (analytics, Sentry, TestFlight, App Store)
+- [x] TestFlight beta ✓
+- [x] App Store approved and live ✓ (June 30, 2026)
+- [x] v1.1 shipped ✓ (July 2026 — Gmail import improvements)
 
 ---
 
