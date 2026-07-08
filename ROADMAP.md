@@ -96,22 +96,42 @@ Shipped one week post-launch based on early user feedback.
 
 ---
 
-### v2.0 — AI Travel Agent
+### v2.0 — AI Travel Agent + Professional Agent Platform
 
-*The evolution from passive itinerary organizer to active trip intelligence layer.*
+Two complementary capabilities: an AI-powered personal travel agent for consumers, and a B2B portal that lets real travel agents build and deliver itineraries directly to travelers' Roam Wyld apps.
 
-Unlike generic AI chatbots, the Roam Wyld travel agent knows your actual trip — your bookings, layover windows, passport nationality, visa situation, and free-time gaps. Every answer is grounded in your real itinerary.
+#### Part 1 — AI Personal Travel Agent (Consumer)
+
+The AI agent transforms Roam Wyld from a passive itinerary organizer into an active trip intelligence layer. Unlike generic AI chatbots, this agent knows your actual trip — your bookings, dates, layover windows, passport nationality, and visa situation.
 
 | Capability | What it does |
 |---|---|
-| **Natural language trip planning** | Describe what you want and the agent builds a day-by-day itinerary you can import directly into your trip |
-| **Proactive conflict detection** | Scans bookings for issues — late-night arrivals vs. hotel check-in cutoffs, risky layovers, visa expiry overlapping your stay |
-| **Free-time gap filling** | Identifies unscheduled windows between bookings and suggests activities calibrated to your destinations and style |
-| **Pre-trip briefing** | Personalized pre-departure checklist per trip: visa requirements, passport validity, currency, power adapters, vaccination advisories — specific to your passport and destinations |
-| **Trip Q&A** | Natural language answers about your own trip: "How many Schengen days will I have left when I get to France?" "Do I need a visa for my Dubai layover?" |
-| **Disruption re-planning** | When a flight is canceled or delayed, the agent proactively suggests rebooking options and flags downstream bookings now at risk |
+| **Natural language trip planning** | Describe what you want and the agent builds a full day-by-day itinerary importable directly into your trip |
+| **Proactive conflict detection** | Late-night arrivals vs. hotel cutoffs, risky layovers, visa expiry overlapping your stay — caught before you travel |
+| **Free-time gap filling** | Identifies unscheduled windows and suggests activities calibrated to your destinations and style |
+| **Pre-trip briefing** | Personalized checklist: visa requirements, passport validity, currency, adapters, vaccination advisories — specific to your passport and destinations |
+| **Trip Q&A** | "How many Schengen days will I have left when I get to France?" "Do I need a visa for my Dubai layover?" Answered against your actual itinerary |
+| **Disruption re-planning** | Flight canceled? Agent surfaces rebooking options and flags downstream bookings now at risk |
 
-**Why this is the right v2.0 move:** Claude is already integrated for transit directions and discover suggestions. The agent is an extension of existing infrastructure. The context advantage is the moat — Roam Wyld knows your trip in a way no generic AI does.
+#### Part 2 — Professional Travel Agent Platform (B2B)
+
+Travel agents build itineraries for clients and deliver them directly to travelers' Roam Wyld apps — ready to use offline, with all companion features available from day one.
+
+**The problem:** Travel agents send PDFs. Clients can't use them offline, don't get alerts, and re-enter everything manually if they want a travel app. Roam Wyld becomes the delivery format.
+
+| Feature | Detail |
+|---|---|
+| **Agent web portal** | `agents.roamwyld.app` — build full itineraries with the same booking types as the app |
+| **Multi-traveler assignment** | Assign bookings to individual travelers or the full group |
+| **PDF + paste import** | Import from existing tools; Claude parses and structures the bookings |
+| **One-tap delivery** | Traveler opens a link → full trip is waiting in their app |
+| **Read-only traveler view** | Agent owns the source of truth; travelers view but can't edit |
+| **Branded delivery** | Professional tier: "Your trip from [Agency Name] is ready" |
+| **Traveler analytics** | Did they open it? Did they enable offline? Agent gets confirmation |
+
+**Agent pricing:** Free (3 active trips) · Professional $29/mo (unlimited, branded) · Enterprise (white-label)
+
+**Why this wins:** No competitor does this. TripIt, Tripsy, and Wanderlog are consumer-only. Every agent-delivered trip is a new Roam Wyld install — the traveler becomes an organic user for their next trip. Agent subscriptions are higher-value and lower-churn than consumer Pro.
 
 ---
 
