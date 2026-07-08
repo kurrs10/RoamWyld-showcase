@@ -96,6 +96,25 @@ Shipped one week post-launch based on early user feedback.
 
 ---
 
+### v2.0 — AI Travel Agent
+
+*The evolution from passive itinerary organizer to active trip intelligence layer.*
+
+Unlike generic AI chatbots, the Roam Wyld travel agent knows your actual trip — your bookings, layover windows, passport nationality, visa situation, and free-time gaps. Every answer is grounded in your real itinerary.
+
+| Capability | What it does |
+|---|---|
+| **Natural language trip planning** | Describe what you want and the agent builds a day-by-day itinerary you can import directly into your trip |
+| **Proactive conflict detection** | Scans bookings for issues — late-night arrivals vs. hotel check-in cutoffs, risky layovers, visa expiry overlapping your stay |
+| **Free-time gap filling** | Identifies unscheduled windows between bookings and suggests activities calibrated to your destinations and style |
+| **Pre-trip briefing** | Personalized pre-departure checklist per trip: visa requirements, passport validity, currency, power adapters, vaccination advisories — specific to your passport and destinations |
+| **Trip Q&A** | Natural language answers about your own trip: "How many Schengen days will I have left when I get to France?" "Do I need a visa for my Dubai layover?" |
+| **Disruption re-planning** | When a flight is canceled or delayed, the agent proactively suggests rebooking options and flags downstream bookings now at risk |
+
+**Why this is the right v2.0 move:** Claude is already integrated for transit directions and discover suggestions. The agent is an extension of existing infrastructure. The context advantage is the moat — Roam Wyld knows your trip in a way no generic AI does.
+
+---
+
 ### Future — Platform Expansion
 
 | Feature | Timeline | Detail |
