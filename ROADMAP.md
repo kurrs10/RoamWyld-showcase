@@ -13,9 +13,9 @@ The core product. Every feature below is live, free, and works offline.
 |---------|--------|
 | Manual trip entry (flights, hotels, activities) | ✅ Shipped |
 | Gmail booking import (OAuth, AI-parsed) | ✅ Shipped |
-| Step-by-step AI transit guidance | ✅ Shipped |
+| Step-by-step AI transit guidance | ⚪ Descoped — built (`transit-directions` Edge Function + service layer, still in the codebase) but the UI that surfaced it lived on an old screen that was never wired into navigation after a later screen replaced it. Not reachable in the live app. |
 | Visa & entry requirements per destination | ✅ Shipped |
-| Offline caching — full itinerary, directions, requirements | ✅ Shipped |
+| Offline caching — full itinerary, requirements | ✅ Shipped |
 | Booking validation — flights (AviationStack) + hotels (Google Places) | ✅ Shipped |
 | Discover — AI suggestions by destination, budget, interests | ✅ Shipped |
 | Emergency info — local numbers, embassy contacts, hospitals | ✅ Shipped |
@@ -23,8 +23,9 @@ The core product. Every feature below is live, free, and works offline.
 | Language basics — 30–40 key phrases per country (offline) | ✅ Shipped |
 | Travel insurance reference storage | ✅ Shipped |
 | Schengen day tracker | ✅ Shipped |
+| Group / couple mode — add a travel partner, shared itinerary, invite link | ✅ Shipped (Phase 4, pre-launch) — was misfiled under "What's Next" as a future v1.3 item below; corrected 2026-08-01. Shared-trip read access for accepted invitees expanded in Build 20. |
 | PostHog analytics + Sentry error monitoring | ✅ Shipped |
-| 699-test automated test suite | ✅ Shipped |
+| 759-test automated test suite | ✅ Shipped — updated 2026-08-01 (was 699 at launch; count only goes up) |
 
 **Launch decision:** v1.0 launched fully free. All founding cohort users receive Pro access permanently — no charge, no expiration — when Pro launches in v1.1.
 
@@ -46,25 +47,28 @@ Shipped one week post-launch based on early user feedback.
 
 ## What's Next
 
-### v1.2 — Alerts & Notifications (Q3 2026)
-*Top priority. Real-time flight status is the #1 reason users run TripIt or CheckMyTrip alongside Roam Wyld.*
+> **Note on version labels below (added 2026-08-01):** the v1.2/v1.3/v1.4 labels in this section were assigned aspirationally, before actual releases happened, and have since drifted from what those version numbers really shipped (real v1.2, Build 20, shipped shared-trip invites + expanded Gmail import — not what's labeled v1.2 below). Read these as ordered future work, not as commitments to specific version numbers.
+
+### Alerts & Notifications
+*Real-time flight status is the #1 reason users run TripIt or CheckMyTrip alongside Roam Wyld — but this is currently paused, not top priority.*
+
+**🛑 Status update 2026-08-01: no-go for now.** Foundational app-experience work takes priority over building this out. The interim approach — computing flight/layover duration from Gmail-parsed confirmation text plus a calculated fallback — is judged sufficient for the time being. Revisit once foundational work is further along.
 
 | Feature | Priority | Detail |
 |---------|----------|--------|
-| Push notifications — Firebase FCM | Prerequisite | Required infrastructure for all alerts |
-| Real-time flight alerts | TOP | Gate changes, delays, cancellations surfaced before the traveler checks |
-| Trip reminders | High | "Your flight to Tokyo is tomorrow" day-before nudge |
-| Re-engagement nudges | Medium | Prompt users to finish itinerary setup before departure |
+| Push notifications — Firebase FCM | Prerequisite (paused) | Required infrastructure for all alerts |
+| Real-time flight alerts | Paused | Gate changes, delays, cancellations surfaced before the traveler checks |
+| Trip reminders | High (paused) | "Your flight to Tokyo is tomorrow" day-before nudge |
+| Re-engagement nudges | Medium (paused) | Prompt users to finish itinerary setup before departure |
 
 ---
 
-### v1.3 — Group & Couple Mode (Q3 2026)
-*Primary viral acquisition loop — every shared trip is a potential new install.*
+### Group & Couple Mode Extensions
+
+Core group/couple mode already shipped (see What's Shipped above) — this is further extension work, not the base feature.
 
 | Feature | Priority | Detail |
 |---------|----------|--------|
-| Add a travel partner to any trip | High | Shared itinerary view, color-coded by person |
-| Group invite link | High | Shareable link → recipient downloads app → lands on shared trip |
 | Per-person booking assignment | Medium | Assign specific bookings to each traveler |
 | Pre-trip checklist with per-person tasks | Medium | Packing, visa tasks, etc. assigned to each person |
 
@@ -139,9 +143,9 @@ Travel agents build itineraries for clients and deliver them directly to travele
 
 | Feature | Timeline | Detail |
 |---------|----------|--------|
-| Android | 2027 | React Native codebase is cross-platform; iOS-first was a launch scope decision |
+| Android | **In progress, targeted to begin mid-August 2026** (updated 2026-08-01) | React Native codebase is cross-platform. Work begins after the current iOS feature-update pass finishes; targeting Google Play (org account, no closed-testing gate) |
 | Outlook import | 2027 | Gmail covers the core persona; Outlook targets enterprise users — post-traction |
-| PDF itinerary upload | 2027 | Brittle across formats; email import covers 90% of the use case at launch |
+| PDF / photo itinerary upload | **Actively spec'd, build pending founder review** (updated 2026-08-01) | Full interaction spec complete: unified action sheet for PDF or photo capture, Claude vision for photos (~1.5–2¢/import), 8-page cap. No longer a 2027 idea — this is near-term backlog. |
 | Affiliate revenue | Ongoing | Airalo (eSIM), SafetyWing (insurance), Wise (currency), iVisa (visa assistance) |
 
 ---
@@ -162,7 +166,7 @@ Travel agents build itineraries for clients and deliver them directly to travele
 These four features are the core product promise. No scope decision touches them:
 
 - **Offline caching** — travelers need this app when they have no signal
-- **Transit guidance** — the feature no competitor provides at this depth
+- **Transit guidance** — the feature no competitor provides at this depth. ⚠️ **Currently contradicted by reality** (see What's Shipped above — this is descoped/unreachable in the live app as of 2026-08-01). Leaving this principle in place as a statement of intent, but it needs either a fix (re-wire the existing built feature into the live screen) or an honest scope decision, not silence.
 - **Entry requirements** — safety-critical; never paywalled
 - **Booking validation** — trust is the product; a wrong confirmation number at the airport is a failure
 
@@ -172,6 +176,6 @@ These four features are the core product promise. No scope decision touches them
 
 | Service | Upgrade Trigger |
 |---------|----------------|
-| AviationStack (free → $49.99/mo Professional) | MRR $50+ OR validation requests approach 100/mo free limit |
+| AviationStack (free → $49.99/mo **Basic**, corrected 2026-08-01 — "Professional" is a separate, pricier $149.99/mo tier) | MRR $50+ OR validation requests approach 100/mo free limit |
 | Google Places (add billing cap) | DAUs exceed 100 |
 | Claude API (cost review) | MRR > $200 — benchmark Gemini Flash for Gmail parsing if cost delta justifies |
