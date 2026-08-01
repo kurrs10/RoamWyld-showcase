@@ -1788,3 +1788,53 @@ Major rewrite of `src/services/gmailImport.ts`:
 - Update Apple Developer account Individual → Business (blocked on D-U-N-S from D&B, applied 2026-07-04)
 - Reapply to Airalo affiliate program (app now live)
 - Reddit posts (r/solotravel, r/travel, r/digitalnomad)
+
+---
+
+## Session — 2026-07-31 | Android Scoping, Customer Feedback Triage, v1.3 Tier 1 Build
+
+### Android Scoping
+
+Initially framed as "build Android for Setapp distribution" — research corrected this: Setapp Mobile was sunset in Feb 2026 and never distributed Android; its actual ask (revealed by its rejection of the app) was a macOS build, which was evaluated and decided against as not worth it for the target customer. **Android stays in scope, purely for Google Play**, targeted to begin mid-August after the iOS feature-update pass below.
+
+### Customer Feedback Triage → v1.3 Backlog
+
+Real feedback from a beta tester plus the founder's own field notes from using the app were triaged into a prioritized backlog (3 tiers, by validation strength and effort). One item stood out: the founder's own note about needing real-time flight status/gate info independently confirmed the existing #1 roadmap priority (real-time flight alerts) — a nice example of production usage validating a planning decision made months earlier, rather than surfacing something new.
+
+A parallel UX audit found a root architecture gap: the data model has no per-destination date range, so "which destination is the traveler in today" can't be computed for multi-destination trips — the shared root cause behind two backlog items that looked like simple UI fixes but actually need a data-model change. Also surfaced: the Emergency Info screen defaults to the wrong destination on multi-city trips (safety-relevant, not previously tracked), and a real conflict between two already-established UX standards that got flagged for an explicit decision rather than silently resolved one way.
+
+Full interaction-level specs (Discover → Analyze → Act → Validate) were then written for all 18 backlog items. Two turned out not buildable as scoped on first look: one appears to already be shipped and needs founder clarification on what's actually missing, and another conflates two different features that need disambiguating before work starts — both flagged rather than guessed at.
+
+### v1.3 Tier 1 — 4 of 5 items built
+
+Built: day-of-week labels on itinerary headers, live comma formatting in the currency converter, auto-scroll-to-today on the trip detail screen, and tappable/expandable booking rows on the Today screen. Held: flight/layover duration display — building it correctly requires a real timezone-handling design decision (no timezone data exists in the schema today), which isn't something to decide silently on the founder's behalf.
+
+**New file:** `src/lib/currencyInputFormat.ts` — pure functions for live thousands-comma formatting with cursor-position tracking, following the repo's established pattern of extracting pure logic for testability. 14 new unit tests.
+
+**qa-engineer caught two real bugs across three review rounds** — a good demonstration of why the mandatory review gate exists rather than a single pass:
+1. A field was read on screen but never added to the local TypeScript type backing it — caught by a type-check pass, not just tests.
+2. The auto-scroll-to-today feature only worked once per screen mount, so a new "jump to today" link silently stopped working after a trip's first visit in a session. The first fix attempt (a blanket navigation-focus listener) introduced a *new* regression — it also reset scroll position when returning from an unrelated screen. The final fix scoped the re-anchor trigger to only the one entry point that should force it, leaving everything else untouched.
+
+Final QA verdict: **GO**, no blocking issues remaining.
+
+**Regression suite: 727 tests / 30 suites, up from 699/29** — new floor.
+
+### Real-World Dogfooding: Gmail Import Gap
+
+Using the app on an actual trip surfaced two real gaps: guided tour/experience bookings (e.g. Airbnb Experiences) weren't being imported from Gmail at all, and "need to know" trip logistics (e.g. needing cash on hand at a destination) weren't captured or surfaced anywhere — meaning digging back through email mid-trip, which defeats the entire point of the app. Scoped a fix: the booking type and sender recognition mostly already exist, so the real gap is the extraction schema, not sender coverage. A new categorized "need to know" field is proposed, extracted in the same AI parsing pass (no new API call), surfacing prominently for high-stakes categories like payment and meeting-point instructions rather than being buried in general notes.
+
+### Key Decisions
+
+**Currency input: live-format with cursor tracking, not format-on-blur.** Better experience; accepted a minor known rough edge (backspacing exactly on a comma occasionally needs a second press) rather than shipping the materially worse always-format-on-blur fallback.
+
+**Auto-scroll re-anchoring: explicit opt-in param, not a blanket focus listener.** A blanket listener re-anchored scroll position on any screen re-focus, including returning from an unrelated screen — regressing an existing scroll-preservation standard. Scoping the trigger to only the caller that needs it fixed the regression without losing the intended behavior.
+
+**"Jump to today" scroll target: lands on the day, not the exact booking card.** Pinpointing the exact card was a materially bigger lift; capped scope for this pass rather than ballooning a quick-win item.
+
+### Outstanding
+
+- Flight/layover duration display — awaiting a timezone-handling decision
+- Two backlog items awaiting founder clarification before they can be scoped
+- Several navigation/UX audit findings spec'd, not yet built (safety-relevant Emergency Info fix among them)
+- Gmail import experiences/need-to-know fix — spec'd, awaiting a real sample email to finalize sender-domain coverage
+- Two backlog items remain blocked on the per-destination date-range data-model fix
