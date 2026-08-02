@@ -1,6 +1,27 @@
 # Roam Wyld — Success Metrics & PostHog Instrumentation Plan
 
-Canonical mapping of README success metrics to PostHog event names, fire triggers, and required properties. Every event listed here must be instrumented before Phase 5 ships.
+Canonical mapping of README success metrics to PostHog event names, fire triggers, and required properties. Originally written pre-launch as the Phase 5 instrumentation plan — the app has since shipped and actual event names have diverged from this plan in places as features were built. See **Implementation Status** below for what's confirmed live vs. still planned-not-built, verified against `src/lib/analytics.ts` as of 2026-08-02. Where they conflict, the code is the source of truth, not this document.
+
+---
+
+## Implementation Status (verified 2026-08-02)
+
+| Metric | Status | Note |
+|---|---|---|
+| 1. Trip Completion Rate | ⚠️ Partial | `trip_created` and `trip_setup_completed` are real; `traveler_profile_saved` was never built |
+| 2. Booking Import Success Rate | ✅ Live | `import_started/parsed/completed/failed` all real — `method` now includes `'photo'` (PDF/photo import shipped 2026-08-02), not just `'email'\|'pdf'` as originally planned |
+| 3. Validation Pass Rate | ❌ Not built | No `booking_validation_*` events exist |
+| 4. Daily Active Use During Trips | ⚠️ Different shape | No `app_opened`/`trip_viewed` — `session_started` and `today_screen_trip_state` exist instead, narrower than planned |
+| 5. Transit Direction Usage | ⚠️ Different shape | Real event is `transit_directions_viewed` (+ `cache_served`), not the planned `directions_requested/viewed/regenerated` trio |
+| 6. Free-Time Suggestion Tap Rate | ❌ Not built | No `suggestions_shown/tapped/saved` events — Discover and the trip wishlist feature both shipped without dedicated analytics |
+| 7. Return Trip Creation Rate | ✅ Live | `trip_created` carries `trip_number` as planned |
+| 8. Group Invite Rate | ⚠️ Different shape | Real event is `travel_partner_added`, no `group_mode_enabled` |
+| 9. Alert Engagement Rate | ❌ Not built | Real-time flight alerts feature itself is paused (see ROADMAP.md) — no alert events exist |
+| 10. Offline Reliability | ⚠️ Narrower | `cache_served` exists but only for transit directions, not the general `offline_feature_*` trio across all offline features as planned |
+| 11. Crash-Free Session Rate | ✅ Live | `session_started` real; crash-free rate itself tracked via Sentry, not PostHog, as originally planned |
+| 12. Trip Share Usage | ❌ Not built | No `trip_shared`/`trip_share_accepted` events |
+
+**Real events that exist but aren't represented in this plan at all:** the Phase 4 companion features (currency converter, language phrases, emergency numbers, insurance, affiliate links) each have their own dedicated events not mapped to any of the 12 metrics above — see `src/lib/analytics.ts` directly for the current full list rather than relying on this document for those.
 
 ---
 
@@ -20,9 +41,9 @@ Canonical mapping of README success metrics to PostHog event names, fire trigger
 
 | Step | Event Name | Trigger | Key Properties |
 |------|-----------|---------|---------------|
-| Trip created | `trip_created` | `createTrip()` succeeds | `import_method: 'manual'\|'email'\|'pdf'`, `destination_count` |
-| First booking added | `booking_added` | `createBooking()` succeeds | `trip_id`, `booking_type: 'flight'\|'hotel'\|'activity'`, `import_method` |
-| Traveler profile saved | `traveler_profile_saved` | Profile save succeeds | `has_passport_nationality: bool`, `has_insurance: bool` |
+| Trip created | `trip_created` | `createTrip()` succeeds | `destinationCount`, `durationDays`, `trip_number` (actual params — no `import_method` on this event) |
+| First booking added | `booking_added` | `createBooking()` succeeds | `type`, `source: 'manual'\|'gmail_import'\|'pdf_import'\|'photo_import'` |
+| Traveler profile saved | `traveler_profile_saved` | Profile save succeeds | ❌ Not built — no event exists for this step |
 | Trip setup completed | `trip_setup_completed` | User has ≥1 booking + profile filled | `trip_id`, `booking_count`, `import_methods_used: string[]`, `destination_count` |
 
 **Funnel:** `trip_created` → `booking_added` → `trip_setup_completed`
@@ -30,11 +51,11 @@ Canonical mapping of README success metrics to PostHog event names, fire trigger
 ---
 
 ### 2. Booking Import Success Rate
-**Definition:** % of email/PDF imports that parse all bookings without manual correction
+**Definition:** % of email/PDF/photo imports that parse all bookings without manual correction
 
 | Event | Trigger | Key Properties |
 |-------|---------|---------------|
-| `import_started` | User taps email/PDF import | `method: 'email'\|'pdf'` |
+| `import_started` | User taps Gmail/PDF/photo import | `method: 'email'\|'pdf'\|'photo'` |
 | `import_parsed` | Parser returns results | `method`, `bookings_found: number`, `parse_errors: number` |
 | `import_completed` | User confirms import | `method`, `bookings_imported: number`, `bookings_deselected: number` |
 | `import_failed` | Parser throws / returns 0 results | `method`, `error_type: string` |

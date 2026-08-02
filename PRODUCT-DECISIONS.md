@@ -140,6 +140,33 @@ After this runs: set `ALL_FREE = false`, configure RevenueCat offerings, submit 
 
 ---
 
+## Cost & Infrastructure Decisions
+
+### Real-Time Flight Status/Gate Alerts: Paused, Cheaper Alternative Shipped Instead
+**Decision:** Instead of building real-time flight status/gate alerts as requested — which would require upgrading to a paid flight-data API tier ($49.99/mo) plus new push-notification infrastructure — flight duration/layover display now reads the duration airlines already print as plain text in confirmation emails, falling back to a computed estimate only when nothing is stated.
+**Rejected:** Building the full real-time-alerts feature now, absorbing the new recurring cost and infrastructure build immediately.
+**Why:** The AI email-parsing pipeline already extracts confirmation numbers and flight numbers from the same emails — it just wasn't reading the duration/layover text that was already sitting there. That gets most of the practical value (knowing how long your flight or layover will be) at effectively zero incremental cost. The paid upgrade stays on the roadmap, tied to concrete future triggers (revenue threshold, support tickets about unverified future flights, approaching the free tier's request cap) rather than being silently dropped. When a feature request implies a recurring cost, the first question is what data already gets most of the value for free — not whether to pay for it.
+
+### In-App Trip Chat: Parked Indefinitely
+**Decision:** Trip chat stays on the roadmap but implementation is deliberately not decided — the real open question (an AI assistant vs. peer-to-peer messaging between travelers) needs more user feedback before it can be scoped responsibly.
+**Rejected:** Building either version now to make forward progress, or defaulting to whichever is technically simpler.
+**Why:** The two versions solve genuinely different problems and would be built completely differently. Guessing now risks building the wrong one and having to redo it once real feedback arrives. This was previously miscategorized as blocked by the same open question as phrase translation (see UX Decisions) — it isn't, and decoupling them let translation ship on its own timeline.
+
+### Offline Map Tiles: Descoped
+**Decision:** True offline map tiles (downloading map imagery for full offline use) are out of scope for the map view feature.
+**Rejected:** Building offline tile support as part of the initial map view.
+**Why:** Judged not valuable enough to customers relative to its cost and complexity — and building it only partially would sit in real tension with the app's core "everything works offline" positioning. Better to not promise it than to promise it and deliver something half-working.
+
+---
+
+## Persona Decisions
+
+### Hiking / Hut-to-Hut Travel Added as a Target Persona
+**Decision:** Multi-day trail and hut-to-hut travel is now an explicit persona the product designs for — Discover's AI suggestion engine now surfaces trail systems and hut-to-hut routes as legitimate suggestions, not just restaurants and city sights, when relevant to a traveler's interests.
+**Why:** This style of travel has grown significantly and wasn't represented anywhere in how the product evaluates what to suggest to travelers. A product built for "self-planned, multi-country travel" was implicitly assuming a city-to-city itinerary shape. Naming the persona explicitly means every future Discover/itinerary feature gets evaluated against it too, not just this one prompt change.
+
+---
+
 ## Process Decisions
 
 ### Demo Panels at the End of Every Phase
@@ -149,3 +176,7 @@ After this runs: set `ALL_FREE = false`, configure RevenueCat offerings, submit 
 ### Never Close a Phase Without a DEVLOG Entry
 **Decision:** No phase is marked done without a written record of decisions, problems solved, and panel feedback.
 **Why:** The code shows what was built. The DEVLOG shows how decisions were made. For a solo project, this is the equivalent of a product council decision memo — it forces reflection and creates an artifact that explains the reasoning behind every significant choice.
+
+### Ambiguous Features Require Sign-Off Before Build Starts
+**Decision:** For features with a genuinely ambiguous interaction design or technical approach (not every feature — most are unambiguous enough to just build), an architecture reviewer and a product-requirements reviewer must both sign off on the written spec before a single line of code is written.
+**Why:** Applied for the first time to PDF/photo itinerary import, a feature with real open questions (how photo capture should flow, how compression should work, what disclosure a user needs before a document leaves their device). Both reviewers found real, fixable problems on the first pass — a disclosure screen that would show the wrong copy depending on which import path a user took, a client/server timeout mismatch that would cause spurious failures on real usage, and an incorrect assumption that some new work could reuse code that didn't actually exist yet. All three were cheap to fix on paper, before any code existed to rewrite. The alternative — building first and discovering these during QA or in production — is strictly more expensive the later it's caught.

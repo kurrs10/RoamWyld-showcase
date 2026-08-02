@@ -25,7 +25,7 @@ The core product. Every feature below is live, free, and works offline.
 | Schengen day tracker | ✅ Shipped |
 | Group / couple mode — add a travel partner, shared itinerary, invite link | ✅ Shipped (Phase 4, pre-launch) — was misfiled under "What's Next" as a future v1.3 item below; corrected 2026-08-01. Shared-trip read access for accepted invitees expanded in Build 20. |
 | PostHog analytics + Sentry error monitoring | ✅ Shipped |
-| 759-test automated test suite | ✅ Shipped — updated 2026-08-01 (was 699 at launch; count only goes up) |
+| 779-test automated test suite | ✅ Shipped — updated 2026-08-02 (was 699 at launch; count only goes up) |
 
 **Launch decision:** v1.0 launched fully free. All founding cohort users receive Pro access permanently — no charge, no expiration — when Pro launches in v1.1.
 
@@ -42,6 +42,22 @@ Shipped one week post-launch based on early user feedback.
 | User-compiled itinerary emails now parsed | Emails like "Honeymoon Itinerary — Full Details" extract every booking as individual entries |
 | Snippet limit increased 4,000 → 8,000 chars | Long itinerary emails no longer truncated mid-trip |
 | Booking import scoring improved | Itinerary-style emails surface at top of import regardless of sender domain |
+
+---
+
+### v1.3 — Navigation, Import & Discovery Improvements (August 2026)
+Shipped from a customer-feedback triage: a beta tester's real usage plus the founder's own field notes from a trip.
+
+| Feature | Detail |
+|---------|--------|
+| Navigation-audit batch | Emergency Info, Phrases, and Currency now all default to the traveler's *current* destination on multi-destination trips instead of always the first — the Emergency Info fix was safety-relevant (wrong-country emergency numbers). Plus: visa/passport alerts auto-expand, trip list sorts by relevance not insert order, day headers show city/country, invite acceptance routes directly into the joined trip. |
+| PDF / photo itinerary import | Import a booking confirmation from a PDF or up to 8 photos, alongside the existing Gmail import — same AI parsing pipeline, no separate OCR step. Reviewed by an architecture role and a product-requirements role before build started (see PRODUCT-DECISIONS.md); QA caught and fixed 2 launch-blocking issues before shipping. |
+| Phrase translation | One-shot translation tool on the Phrases card, for any phrase and any language — not limited to the ~15 countries the static phrasebook covers. Deliberately kept separate from the still-undecided in-app chat concept. |
+| Trip wishlist | Bookmark Discover suggestions to a trip, schedule them into a real booking later, or remove them. |
+| Discover — reservation/permit badges | Suggestions that need advance booking or a permit are now flagged. |
+| Discover — distance scoping | Suggestions stay within walking/short-transit distance of the destination. |
+| Trip timeline — free-time breakdown | Shows the gap between two scheduled bookings on the same day. |
+| Hiking / hut-to-hut persona | Discover now surfaces trail systems and multi-day hut-to-hut routes as legitimate suggestions, not just restaurants and city sights — see PRODUCT-DECISIONS.md. |
 
 ---
 
@@ -71,6 +87,15 @@ Core group/couple mode already shipped (see What's Shipped above) — this is fu
 |---------|----------|--------|
 | Per-person booking assignment | Medium | Assign specific bookings to each traveler |
 | Pre-trip checklist with per-person tasks | Medium | Packing, visa tasks, etc. assigned to each person |
+
+---
+
+### Held — Pending Founder Decision
+
+| Feature | Status | Detail |
+|---------|--------|--------|
+| Map view — see all bookings located relative to each other | Held (updated 2026-08-02) | Fully spec'd, but genuinely needs a cost decision first: a paid geocoding provider and a new `address` field on bookings that doesn't exist today. **True offline map tiles are descoped** — judged not valuable enough to customers to justify the cost, and in tension with the app's "everything works offline" positioning if done only partially. |
+| In-app trip chat | Parked indefinitely (updated 2026-08-02) | The real open question — an AI assistant vs. peer-to-peer messaging between travelers — needs more user feedback before it can be scoped responsibly. Not blocked on anything else; genuinely undetermined. |
 
 ---
 
@@ -145,7 +170,6 @@ Travel agents build itineraries for clients and deliver them directly to travele
 |---------|----------|--------|
 | Android | **In progress, targeted to begin mid-August 2026** (updated 2026-08-01) | React Native codebase is cross-platform. Work begins after the current iOS feature-update pass finishes; targeting Google Play (org account, no closed-testing gate) |
 | Outlook import | 2027 | Gmail covers the core persona; Outlook targets enterprise users — post-traction |
-| PDF / photo itinerary upload | **Actively spec'd, build pending founder review** (updated 2026-08-01) | Full interaction spec complete: unified action sheet for PDF or photo capture, Claude vision for photos (~1.5–2¢/import), 8-page cap. No longer a 2027 idea — this is near-term backlog. |
 | Affiliate revenue | Ongoing | Airalo (eSIM), SafetyWing (insurance), Wise (currency), iVisa (visa assistance) |
 
 ---

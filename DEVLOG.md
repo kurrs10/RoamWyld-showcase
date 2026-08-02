@@ -1838,3 +1838,61 @@ Using the app on an actual trip surfaced two real gaps: guided tour/experience b
 - Several navigation/UX audit findings spec'd, not yet built (safety-relevant Emergency Info fix among them)
 - Gmail import experiences/need-to-know fix — spec'd, awaiting a real sample email to finalize sender-domain coverage
 - Two backlog items remain blocked on the per-destination date-range data-model fix
+
+---
+
+## Session — 2026-08-01 to 2026-08-02 | Navigation Audit Ships, PDF/Photo Import, Translate, Backlog Decisions
+
+The largest single session of this build cycle. Shipped the full navigation-audit batch, built and shipped two new backlog items end-to-end (PDF/photo itinerary import, phrase translation), wired two more items that were previously unblocked but not yet built, and made four real product-scope calls that needed a founder decision rather than a default.
+
+### Navigation-Audit Batch — All 6 Findings Shipped
+
+The shared "current destination" helper (landed the prior session) unblocked six navigation fixes, all shipped this session after two rounds of QA review:
+- Emergency Info now defaults to the traveler's *current* destination, not always the first leg on the trip — this was safety-relevant (wrong-country emergency numbers on multi-destination trips), not just a UX nit.
+- Visa/passport "action required" alerts now auto-expand instead of hiding behind a default-collapsed accordion.
+- Trip list now sorts active-first, then soonest-upcoming, then most-recent-past, instead of raw insert order.
+- Day section headers now show the city/country on multi-destination trips.
+- Invite acceptance routes straight into the joined trip instead of the trip list.
+- Discover's trip-switch destination index is computed from the current destination instead of always defaulting to the first.
+
+QA caught two real bugs across the review rounds before these shipped, including one safety-relevant race condition in the Emergency Info screen.
+
+### Further Backlog Items
+
+A trip wishlist (bookmark Discover suggestions, schedule or remove later), "reservation/permit required" badges on Discover suggestions, Discover results scoped to walking/short-transit distance of the destination, and a start/end time + free-period breakdown on the trip timeline all shipped this session. A map view feature was fully spec'd but correctly held rather than built (see Decisions below).
+
+### PDF / Photo Itinerary Import — Full Build
+
+The instruction going in was explicit: the architect and product-owner reviewer roles had to sign off on the interaction spec before any code was written. Both found real gaps on the first pass — a disclosure-copy bug that would show PDF-specific language on the photo path, a client/server timeout mismatch, and an incorrect assumption about reusing unbuilt code. All three fixed, both reviewers signed off, then it was built.
+
+Users now get one **Import** button alongside the existing Gmail import, an action sheet to choose a PDF or take/pick a photo, a one-time disclosure explaining the document is processed by AI and not retained, and — for photos — a multi-page flow so a full itinerary can be captured as up to 8 photos before parsing. PDF and photo both go through the same backend parsing path — no separate OCR step, no format-specific handling.
+
+**QA caught two blocking issues before this could ship.** First: the AI extraction prompt asked for a booking type the app doesn't actually support anywhere downstream — any document containing that booking type would parse successfully, appear selectable, and then guaranteed-fail to save. A 100% reproducible dead end on a real, advertised use case. The same latent bug existed in the Gmail-import parser too — inherited, not new to this feature, and fixed in both places. Second: client and server timeouts on the slower (photo) path were set equal, with zero margin for real network latency and server overhead — a legitimate slow parse could get aborted client-side moments before a valid result would have arrived. Plus three lower-severity issues (a fast double-tap could start two overlapping imports; the new confirmation modals could be swiped away into a stuck state; an unhandled promise rejection on the one-time-disclosure check). All fixed and re-verified before shipping.
+
+### Phrase Translation
+
+A one-shot phrase translator added to the existing Phrases card — deliberately kept separate from the still-parked in-app chat concept (see Decisions). Target language is a free-text field, not restricted to the ~15 countries the static phrasebook already covers, since the whole point of this feature is covering what that static list doesn't. Rate-limited server-side to guard against abuse, reusing the same pattern already proven by the transit-directions feature.
+
+QA caught one blocking issue (no protection against a slower, abandoned request's result silently overwriting a newer one — the same pattern already solved elsewhere in the app, just not reused here yet) and two lower-severity issues (no synchronous double-tap guard; the free-text language field wasn't contained the same way every other user-supplied field going into an AI prompt is elsewhere in this codebase). All fixed and re-verified.
+
+### Language + Currency Current-Destination Defaults
+
+Two items that were unblocked by the navigation-audit work but not yet wired: the Phrases card's language default and the currency converter's default country now both resolve to the traveler's *current* destination instead of always the first leg on the trip. The currency converter's existing "remember my last choice" behavior is preserved unchanged — this only fills in the default for someone who hasn't picked yet.
+
+QA flagged one tracked (non-blocking) gap: a manual selection made right as one of these async defaults is still resolving can get silently overwritten. Not new to this session — it already existed in the original Emergency Info fix — logged to close across all three screens together rather than patch piecemeal.
+
+### Four Product-Scope Decisions
+
+1. **Real-time flight status/gate alerts: paused, cheaper alternative shipped instead.** Building this as requested would have meant a new recurring paid API tier plus new push-notification infrastructure. Instead, flight duration/layover display now reads the duration airlines already print as plain text in confirmation emails, falling back to a computed estimate only when nothing is stated — delivering most of the same practical value with no new recurring cost. The paid upgrade stays on the roadmap, tied to concrete future triggers, not silently dropped.
+2. **In-app trip chat: parked indefinitely.** The real open question — an AI assistant vs. peer-to-peer messaging — needs more user feedback before it can be scoped responsibly. Previously miscategorized as blocked by the same open question as phrase translation; it isn't, and the two were decoupled.
+3. **Offline map tiles: descoped.** Judged not valuable enough to customers to justify the cost and complexity, and in real tension with the app's "everything works offline" positioning if implemented only partially.
+4. **A hiking / hut-to-hut travel persona added.** Multi-day trail and hut-to-hut travel is increasingly popular and wasn't represented anywhere in how Discover suggestions get generated. Trail systems and hut-to-hut routes are now legitimate Discover suggestions alongside restaurants and city sights, and this persona now factors into how future features get evaluated.
+
+### Regression suite: 779 tests / 35 suites, up from 727/30
+
+### Outstanding
+
+- Manual/device verification of everything shipped this session — a full checklist has been written, nothing above has been tested on a real device yet beyond code review, AI-agent QA review, and the automated suite.
+- The async manual-selection-overwrite gap across Emergency/Today/Currency — tracked, not urgent.
+- Gmail import experiences/"need to know" details — still awaiting a real sample email to finalize.
+- Flight/layover duration display — largely built this cycle, final device verification still pending.

@@ -49,6 +49,7 @@ Individually, partial versions exist (Rome2Rio for routing, Sherpa for visa info
 2. **Offline visa + entry requirements** — TripIt has visa info but requires internet; at a border with no data, Roam Wyld works, TripIt shows a loading spinner
 3. **Live booking validation** — B2B fraud tech brought to consumers; no consumer app validates flight numbers against AviationStack
 4. **Price vs. value** — $29.99/yr vs. Tripsy $59.99/yr with a stronger feature set for international travelers
+5. **Hiking / hut-to-hut trail persona (added 2026-08-02)** — Discover now surfaces trail systems and multi-day hut-to-hut routes as legitimate suggestions, not just restaurants and city sights. Multi-day trail travel is a growing segment none of the competitor set designs for explicitly.
 
 ### Where Roam Wyld Has Gaps (v1.1 Targets)
 
