@@ -2028,3 +2028,42 @@ Fixed: the traveler-list UI now branches explicitly by role — the owner's view
 - Splitting up the app's largest screen component (now over 3,000 lines) — real regression risk if rushed without a dedicated pass; sized up as a scoped decision rather than attempted alongside everything else.
 - Giving trip owners their own membership record — assessed as low-risk, worthwhile, but explicitly a "next session" item, not blocking.
 - The live two-account manual verification — still the one thing that can't be confirmed from code alone, flagged by three separate reviewers as the top remaining priority.
+
+---
+
+## Same day, continued — Live Device Verification, Consolidated Sign-Off Process, TestFlight Release
+
+**Context:** A hard external deadline (release by end of week) reshaped the rest of the day: push automated and live verification as far as possible before any manual testing, consolidate what's left into one clear sign-off document, and ship a build.
+
+### Live verification against a running build, not just automated scripts
+
+Rather than trusting that fixed test scripts would work, actually launched the real app against a live development server and ran the automated test suite for real — catching issues that pure code review or syntax-checking couldn't:
+
+- One flow was missing a navigation step entirely — it could never have passed, a gap invisible without actually running it.
+- Three others were missing a shared setup step that only showed up once tested live.
+- One failure took three attempts and direct screenshot inspection to diagnose correctly — the content was genuinely on screen and correct, but a text-matching pattern was anchored in a way that didn't account for an icon prefix on that specific label. A good reminder that "the test failed" and "the feature is broken" are different claims, and confirming which one is true before changing anything is worth the extra step.
+- Found and cleaned up nearly a dozen duplicate test records that had accumulated from repeated test runs — a small operational hygiene issue, now resolved.
+
+**A process lesson worth keeping:** batching multiple automated test flows together to save time produced *worse*, less reliable results than running them one at a time — the shared test environment doesn't fully reset between flows when batched. Real efficiency here came from a different kind of parallelization (running verification and documentation work side by side), not from batching the tests themselves. Worth knowing before assuming "more parallel" is always faster.
+
+### One consolidated release sign-off script, not scattered checklists
+
+Every manual testing document up to this point covered a different feature, made separately and never unified. Replaced with one entry point that states upfront exactly what's already been verified by automation (so nothing gets re-tested by hand that's already confirmed), and narrows the manual pass down to what genuinely requires a human: real cross-account permission verification, the one-time device/account setup (which now does double duty — the same setup that's needed for testing also produces the demo account a future app-store reviewer would need), a fast visual confidence pass, and a submission checklist.
+
+### Expanding the specialist review roster
+
+Added several additional specialist reviewer roles to the working process (data/schema review, an additional code-review pass before every change ships, privacy/compliance review paired specifically with data decisions, a second mobile-engineering perspective working alongside the first, and a three-way collaboration between requirements-definition roles). One duplicate role was found and removed rather than kept, to avoid two sources of truth silently drifting apart over time. Reporting lines were made explicit as part of adding these: some roles report directly to the product lead, others through an intermediate role — a small thing, but worth deciding deliberately rather than leaving implicit.
+
+### Google API verification — a new finding worth planning around
+
+Continued research into the Gmail integration's verification process turned up a requirement not previously understood: this class of read-only email scope, once it clears the current review stage, likely requires a paid third-party security assessment before full verification completes — a real cost and multi-month timeline to plan for, not something a better resubmission alone resolves. Better to know that now and plan for it than to discover it after finally clearing the current hurdle. A parallel, lower-cost path (staying in a limited testing mode with a manually-approved user list) is being weighed as an alternative for now, since full verification's cost may not be justified at current scale.
+
+### Shipped: new TestFlight build
+
+Latest build submitted for internal testing, bundling the production fix, the platform-compatibility fix, and the full day's review-and-remediation pass on top of everything already live. Per standing process, every build goes to internal testing first — never straight to public release — with a scheduled manual sign-off pass to follow before anything ships further.
+
+### Outstanding
+
+- Manual sign-off pass scheduled for the next day, using the new consolidated script.
+- Google API verification strategy decision — not yet made.
+- The two scoped follow-up items from the demo panel (component decomposition, a data-model completeness fix) — both confirmed as next-session priorities, neither started yet.
