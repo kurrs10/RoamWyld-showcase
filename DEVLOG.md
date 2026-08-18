@@ -1896,3 +1896,135 @@ QA flagged one tracked (non-blocking) gap: a manual selection made right as one 
 - The async manual-selection-overwrite gap across Emergency/Today/Currency — tracked, not urgent.
 - Gmail import experiences/"need to know" details — still awaiting a real sample email to finalize.
 - Flight/layover duration display — largely built this cycle, final device verification still pending.
+
+---
+
+## Session — 2026-08-13 | Recovering Post-Migration Work, Build Gate Hardening, Maestro E2E, Phase 6-9 Roadmap
+
+**Context:** First full build session after a machine migration. Work that had been finished but never committed before the migration (PDF/photo import and Translate polish, currency-scoping fix) had to be recovered and re-verified from scratch rather than resumed.
+
+### Recovered Work — PO-Review Fixes
+
+Re-verified and committed (all 840 tests passing at this point):
+- **Car-rental filtering** — a non-schema booking type from AI extraction is now filtered before it can reach the Review Imports modal, instead of appearing selectable and then guaranteed-failing to save.
+- **Client-side import timeouts** — PDF/photo imports now time out instead of hanging indefinitely.
+- **Live offline detection for Translate**.
+- **Per-trip currency preference scoping** — a manual currency pick on one trip no longer permanently blocks the current-destination default on every other trip.
+- **Manual swipe-to-dismiss** for the three consent/disclosure sheets — React Native's `Modal` ignores `presentationStyle` when `transparent` is true, so native swipe-to-dismiss never actually worked.
+- **User-friendly import error messages** — raw Edge Function/JS error text no longer reaches the user directly.
+- **Extracted async sequence-guard** covering the "double-tap only fires once" / "abandoned request never overwrites a newer one" pattern, generalized out of one-off inline fixes.
+
+### Build Gate — PO + QA Both Held the Recovered Work, All Fixed
+
+Per the standing Build Gate rule, both product-owner and qa-engineer reviewed the recovered work independently and both returned HOLD. Every blocking/major issue fixed before re-submitting:
+- A shared fetch wrapper built its own abort controller and set the abort signal *after* spreading caller options — silently discarding any caller-provided signal, so client-side import timeouts never actually fired. Fixed by forwarding the signal correctly.
+- PDF client timeout was an exact 30s tie with the server's own 30s budget (a race, not a guaranteed-earlier client alert) — dropped to 25s, with the read wrapped so an unreadable file can't leave the import state stuck forever.
+- Error-message extraction gained a fallback that reads the real server-provided error body instead of the fixed, generic literal message the HTTP client library always returns.
+- Translate's offline branch used to unmount the entire input/result/error subtree, clearing an already-visible translation the instant connectivity dropped. Now only the input+submit affordance is gated; results and errors stay rendered.
+- Currency screen's trip-switch handler was calling the country-change handler on every trip switch, permanently persisting the first destination as a fake "manual pick" — the same failure mode the per-trip fix was meant to eliminate, just relocated from global to per-trip scope.
+- The multi-page photo capture prompt had no Cancel button, and swipe-to-dismiss wired straight into clearing up to 8 captured photos with zero confirmation. Added Cancel + a confirm alert on every dismiss path once photos exist.
+- Car-rental-only imports now show "Not Supported Yet" instead of a generic "Nothing Found"; a partial-filter banner appears in Review Imports when a mixed import drops a car rental.
+
+**Regression suite: 845 tests / 40 suites, up from 840/40.**
+
+### Maestro E2E Coverage Added
+
+New scripted end-to-end coverage for everything the prior manual test pass called for (import, translate, currency/language defaults, update-prompt flows). Also re-verified and fixed several pre-existing flows live against the simulator for composite-accessibility-label/selector issues found across the suite. ~11 Maestro-version syntax/behavior gotchas found and documented for future reference.
+
+### Process Changes
+
+- **New standing rule:** release notes + a feature-list sync pass are now mandatory before every App Store/TestFlight build — added after this repo shipped stale feature claims twice.
+- **Phase 6-9 sequencing added to the roadmap**, synthesized from four parallel reviews: Stabilize+Unblock, Notification Foundation, Monetization Launch, One Differentiated Surface. Ground-truth findings from that review: the paywall UI doesn't exist yet, Pro-access logic has zero callers anywhere in the app, and the intended headline Pro feature lives in a screen not registered in navigation — unreachable. Also found the offline-entitlement check fails closed on any error, which would strip Pro access from a traveler exactly when they lose signal abroad — flagged as a real defect independent of monetization timing.
+
+### Outstanding
+
+- The build referenced in this session's own roadmap notes was planned, not confirmed cut.
+- The prior manual device test script — still not run; Maestro coverage now exists for most of it, reducing (not eliminating) the manual burden.
+- A new group-sharing feature was in progress (uncommitted) at the end of this session — see the next entry.
+
+---
+
+## Session — 2026-08-17 | Group Booking Sharing, Full Build Gate Cycle, Quality-Bar Focus
+
+**Context:** A session deliberately redirected away from other in-flight work to focus entirely on finishing and hardening a feature already in progress, under an explicit bar: *"the state of the product and features should be 100% bug free and the need for manual testing should be minimal... I am expecting a high quality product."*
+
+### What shipped: Group Booking Sharing
+
+Trip owners can invite a travel partner; every booking gets a sharing scope — visible to both, or private to its creator — enforced by database-level row security, not client-side filtering. A retroactive-review banner tells the owner how many of their existing bookings became visible when a new member joined. A bulk "Manage Sharing" screen supports re-scoping multiple items at once.
+
+**Bonus fix along the way:** a new SQLite migration test caught that the app's column-migration pattern (`ALTER TABLE ... ADD COLUMN IF NOT EXISTS`) has never actually been valid SQLite syntax — every prior migration using it was silently failing on existing installs, meaning those columns were never actually added outside fresh installs. Replaced with a real existence check before altering, verified against a real database engine in tests (not the usual always-succeeds mock) — a genuine latent bug, not something introduced this session, caught only because this feature needed a new cache column and exercised the path for the first time.
+
+### Build Gate — Two Full Rounds, Both Found Real Blocking Issues
+
+Per the standing Build Gate rule (independent QA + product-owner sign-off required before any build), both reviewed the feature independently before anything was committed.
+
+**Round 1 — both held:**
+- **QA:** "Remove Travel Partner" only ever cleared a cosmetic display label — it never touched the actual membership record. A "removed" partner kept full read/write access to the trip indefinitely, while the owner's UI falsely confirmed the removal succeeded. Real cross-account data exposure, not a corner case.
+- **QA, several more:** no self-service "leave trip" existed; a new modal-chaining pattern relied on an iOS-only API that would silently break on Android (which starts this same week); a bulk visibility update wrote to local cache without confirming the server actually updated each row, which could misrepresent privacy state in the offline cache on a partial failure.
+- **Product owner, more fundamental:** the database permission model only ever let a person see their own membership row (or every row, if owner) — never fellow accepted members. This meant an invited member's app always concluded "no one else has joined," so the entire sharing UI was invisible to every invited member — every booking they created silently saved with default (shared) visibility regardless of intent. The core feature didn't work at all for its primary user.
+- **Product owner:** non-owner members had no persistent way to reach the bulk sharing-management screen at all.
+
+All of the above fixed — real access revocation, a proper self-leave flow, corrected database permissions so accepted members can see each other, an Android-safe fallback for the modal-chaining pattern, and confirmed-write-before-cache-write for bulk visibility changes.
+
+**Round 2 — both re-reviewed the fixes and found more:**
+- **QA, a deployment gap not a code bug:** the new database migrations existed only as local files — never actually pushed to the live project. Both "fixed" issues from round 1 were still live-broken in production until this was caught and corrected.
+- **Product owner, a new problem surfaced by round 1's own fix:** once an invited member could see fellow members, a UI issue became visible — the "other person" chip a non-owner saw was always driven by *the owner's* label for the invited partner, meaning an invited member would see **their own name** displayed as if it were someone else, right next to a newly-added "Leave Trip" action. No longer just cosmetic once a real destructive action was attached to it.
+- **Product owner:** self-leave never cleared the owner's stale display label (a member's own permissions can't write that owner-only field), so the owner's UI stayed stale indefinitely after a member left, with no signal anything changed.
+
+Fixed: the traveler-list UI now branches explicitly by role — the owner's view is unchanged, a non-owner sees a generic non-interactive placeholder instead of their own name, and "Leave Trip" moved onto their own account chip. A new small backend function (mirroring the existing invite-acceptance pattern) now deletes the member's own record *and* clears the owner's stale label server-side in one step, closing a permissions gap a client-side call alone couldn't cross.
+
+**Rounds 3 and 4 (targeted re-verification):** both independently re-verified the round-2 fixes against the actual deployed database changes and the actual current code — both cleared. One new non-blocking note filed for later: the generic "other person" placeholder is an acceptable interim fix, not a permanent one — the durable fix is giving trip owners their own membership record too, which would also let several role-based special cases in the UI collapse.
+
+### Regression suite: 906 tests / 43 suites, up from 901/43
+
+### Outstanding
+
+- Give trip owners a real membership record so the placeholder label can resolve to a real name — backlog, not blocking.
+- The manual two-account/two-device test script for this feature has still never been run — flagged explicitly as the one thing that can't be confirmed from code alone before this is truly release-ready.
+- The prior manual device test script — still not run, held pending this build-out work finishing.
+
+---
+
+## Session — 2026-08-18 | 12-Agent Demo Panel + Full Remediation Pass
+
+**Context:** A full phase-end review — twelve independent specialist reviewers (mobile, architecture, UX research, UX design, QA strategy, executive/product, detailed product requirements, legal/privacy, security, analytics, App Store readiness, and whole-app QA) run in parallel against the group-sharing feature and the app's overall release readiness — followed by fixing every finding regardless of severity.
+
+### The panel's most important finding: a live production outage
+
+**The security reviewer found, by directly probing the live database (not just reading code), that the previous session's database-permission fix had introduced an infinite-recursion error affecting every account's data reads in production** — not just group-sharing users. The migration's own reasoning that a self-referencing permission check was "safe" turned out to be wrong: the database's own safety guard against permission checks re-entering themselves is unconditional, regardless of which logical branch would actually resolve first. This was silently masked in the app because it already falls back to on-device cached data on any fetch failure — so nothing appeared broken to a user, but every fresh sync was quietly failing. Fixed immediately, ahead of every other finding, with a single reusable permission-check function that avoids the self-reference entirely — verified fixed by re-running the same live probe against production.
+
+### Panel results
+
+| Reviewer | Verdict | Key findings |
+|---|---|---|
+| Mobile engineering | Go, with conditions | A UI picker component used throughout one screen doesn't exist on Android at all — would crash immediately once Android work begins |
+| Architecture | Go | Existing permission-check pattern was becoming copy-paste debt across migrations (closed by the outage fix above); trip owners still lack their own membership record, causing many role-based special cases — recommended as next durable fix, not done this session |
+| UX research | Go | Group-oriented language ("shared with the group") read as impersonal for what's actually a two-person travel-partner pairing |
+| UX design | Go, with required fixes | A new status badge broke the screen's own established badge visual language; a tap target fell under the accessibility minimum; a control was missing an accessibility label |
+| QA strategy | No-go on testing maturity | No continuous-integration pipeline existed at all; the new feature's end-to-end test coverage had never actually run green (blocked on a two-account test setup this environment can't stand up on its own); more of the "already covered" automated test suite was silently broken than documented |
+| Executive/product | Go, one clear priority | The review process itself is healthy — real blocking issues were caught and fixed, not runaway iteration — but the manual two-account verification is the one thing that actually de-risks this feature and still hasn't been run |
+| Detailed product requirements | No-go | Spot-checked other recently-shipped features (not sharing) and found three copy/state defects in the PDF/photo import flow |
+| Security | No-go | The production outage above, plus an invite link that could dead-end permanently after 30 days, a race condition on invite acceptance, and a leftover access token that stayed live longer than necessary |
+| Analytics | No-go | Zero usage tracking existed on the new feature's lifecycle beyond the very first step |
+| App Store readiness | No-go | No release notes drafted; the public feature description described a much larger, unbuilt vision as if it were the current feature; no reviewer guidance for a feature that structurally requires two accounts to test |
+| Whole-app QA | Go on code health | Confirmed no regressions elsewhere from the sharing work; found the "full regression" automated suite hadn't been run since before the feature merged and didn't even reference its own new tests |
+
+### Everything fixed this session, beyond the outage
+
+- **Security/data integrity:** closed the invite dead-end and the acceptance race condition; access tokens are now cleared immediately once used; a database sync gap that let a departed member's device retain the other person's shared data after access was revoked is now closed — leaving a shared trip actually purges the local copy, not just the server permission.
+- **Android crash risk:** the affected picker component now has a cross-platform fallback everywhere it's used.
+- **Type-checking:** cleared every remaining type error in the codebase, down to zero — most turned out to be an environment/dependency-resolution issue, not real bugs, but two were genuine pre-existing issues fixed in place.
+- **UX/copy:** the status badge now matches the app's established visual language; tap targets and accessibility labels added; language softened from "group" framing to something that reads correctly for a two-person pairing, synced everywhere it appeared.
+- **Privacy:** added a dedicated "Shared trips" disclosure to the privacy policy (both in-app and on the public website — where a partial version of this disclosure was found sitting uncommitted from a prior session and never actually shipped, until now); the consent copy shown when adding a travel partner now correctly explains that it's a two-way visibility change, not just a one-way save.
+- **Unrelated bonus fixes caught by the same review:** two copy defects and a missing loading-progress indicator in the PDF/photo import flow.
+- **Analytics:** instrumented the new feature's full lifecycle — invites sent and accepted, members removed, visibility changes by where they happened, and the review-banner's shown/dismissed states.
+- **App Store readiness:** corrected the public feature description, which had been describing a much more ambitious vision (color-coded per-traveler views, multiple trip-structure modes, in-app chat, per-person profiles) as if it were the current, shipped feature. Drafted release notes and reviewer guidance for the two-account testing problem.
+- **Testing infrastructure:** a full sweep of the automated test suite (not just the files the panel originally flagged) found roughly a dozen test flows had never actually been syntactically valid against the current version of the testing tool — every one fixed, including a real logic bug found in the process (a setup script had been typing an airport code into what was actually the flight-number field). Added continuous integration — type-checking and the full test suite now run automatically on every change, which didn't exist before this session.
+
+### Regression suite: 920 tests / 44 suites, up from 906/43
+
+### Deliberately not done this session
+
+- Splitting up the app's largest screen component (now over 3,000 lines) — real regression risk if rushed without a dedicated pass; sized up as a scoped decision rather than attempted alongside everything else.
+- Giving trip owners their own membership record — assessed as low-risk, worthwhile, but explicitly a "next session" item, not blocking.
+- The live two-account manual verification — still the one thing that can't be confirmed from code alone, flagged by three separate reviewers as the top remaining priority.

@@ -103,6 +103,11 @@ After this runs: set `ALL_FREE = false`, configure RevenueCat offerings, submit 
 **Rejected:** Build PDF parsing for Phase 2.
 **Why:** PDF parsing is format-dependent, brittle, and has a high error rate across the variety of agency docs and e-tickets travelers actually use. Email import covers the high-confidence confirmation email case. PDF is the long tail — valuable, but not a launch blocker.
 
+### Group Sharing Ships as a Two-Person Model, Not the Original Bigger Vision
+**Decision:** The shipped sharing feature is deliberately narrow — invite one travel partner, per-item visibility (visible to both, or private to whoever added it), enforced at the database level. That's it.
+**Rejected:** The originally-scoped "Group / Couple Mode" — color-coded per-traveler itinerary views, separate trip-structure modes for traveling together vs. apart, per-person passport/insurance/emergency profiles, in-app trip chat, and a pre-trip checklist with task assignment.
+**Why:** The bigger vision was still sitting in the product's own feature list as if it were built, discovered during an app-store-readiness review. Rather than either quietly ship the mismatch or scramble to build the full vision under review pressure, the call was to ship what actually solves the core need (two people seeing the same itinerary, with a privacy escape hatch) and be explicit that the rest is a real future direction, not a broken promise. A narrower, correctly-described feature beats a broader, inaccurately-described one.
+
 ---
 
 ## UX Decisions
@@ -180,3 +185,11 @@ After this runs: set `ALL_FREE = false`, configure RevenueCat offerings, submit 
 ### Ambiguous Features Require Sign-Off Before Build Starts
 **Decision:** For features with a genuinely ambiguous interaction design or technical approach (not every feature — most are unambiguous enough to just build), an architecture reviewer and a product-requirements reviewer must both sign off on the written spec before a single line of code is written.
 **Why:** Applied for the first time to PDF/photo itinerary import, a feature with real open questions (how photo capture should flow, how compression should work, what disclosure a user needs before a document leaves their device). Both reviewers found real, fixable problems on the first pass — a disclosure screen that would show the wrong copy depending on which import path a user took, a client/server timeout mismatch that would cause spurious failures on real usage, and an incorrect assumption that some new work could reuse code that didn't actually exist yet. All three were cheap to fix on paper, before any code existed to rewrite. The alternative — building first and discovering these during QA or in production — is strictly more expensive the later it's caught.
+
+### High-Stakes Reviews Verify Against the Live System, Not Just the Diff
+**Decision:** For anything touching production data access (permissions, auth, cross-account data flows), a review isn't complete from reading code alone — it has to include a real check against the live system's actual behavior.
+**Why:** A security-focused review of a database-permission change read the code, read the migration's own comment claiming a particular pattern was "safe," and then verified that claim directly against the live database instead of trusting it — and found the claim was wrong. The change had silently broken every account's data sync in production, masked only because the app happens to fall back to cached data on any failed request. A code-only review would very plausibly have signed off on the confident, wrong comment. The fix and the lesson both matter: the fix was fast once found, but it was only found because "verify the claim, don't just read it" was the standard for this class of change.
+
+### Fix Every Finding a Review Surfaces, Not Just the Severe Ones
+**Decision:** When a structured review (the demo panel, a Build Gate pass) returns findings, the default is to fix all of them in the same pass — including the ones tagged low-severity — rather than triaging down to "blockers only."
+**Why:** Several of the lower-severity findings in one review pass (a stale code comment describing behavior that had actually changed, an inconsistent button-label capitalization, a missing loading indicator) were cheap enough that deferring them would have cost more in tracking overhead than just fixing them on the spot. Reserving "skip it" for genuinely large, separately-scoped work (a large file needing a dedicated refactor, a data-model change worth its own session) keeps the backlog meaningful instead of becoming a dumping ground for anything not on fire.
