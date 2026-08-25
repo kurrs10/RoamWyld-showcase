@@ -2067,3 +2067,72 @@ Latest build submitted for internal testing, bundling the production fix, the pl
 - Manual sign-off pass scheduled for the next day, using the new consolidated script.
 - Google API verification strategy decision — not yet made.
 - The two scoped follow-up items from the demo panel (component decomposition, a data-model completeness fix) — both confirmed as next-session priorities, neither started yet.
+
+---
+
+## Manual Sign-Off Testing, Three Defect-Fix Batches, Production Release, Component Decomposition (August 19–24, 2026)
+
+**Context:** Kirsten ran the consolidated manual sign-off script against the internal TestFlight build (Build 27) the day after it shipped — the founder's own live pass, not a bug hunt, per the standing "manual testing is a sign-off" process. It surfaced 22 items, none structural: the underlying cross-account permission behavior held up clean. What followed was three same-day-turnaround fix batches, a production release, and a long-scheduled internal refactor — five days of substantial work, reconstructed and synced here after a documentation gap (see the next entry for how that happened).
+
+### Round 1 — 22 items found, 10 fixed same day
+
+Split Gmail/PDF import loading states that had shared one flag; restored flight duration/layover data that a field-mapping gap had been silently dropping for Gmail-imported flights; fixed per-passport entry requirements returning "no data" for every non-US destination (the one feature on this app's own "never cut" list, now confirmed working again); added a date/time picker to the Discover tab's "add to trip" action instead of silently guessing a time; removed a confirmation dialog for photos that were never actually being stored in the first place; made the "leave a shared trip" action visibly discoverable instead of hidden behind an unlabeled tap; added light duplicate-booking detection; fixed a stale-cache bug that hid an accepted shared trip from the Discover tab; added a refresh-on-return so a removed travel partner's chip actually clears; and improved the copy shown when someone reuses an already-accepted invite link. One item — an in-app way to invite a travel partner directly by email or phone — was explicitly decided against: the existing native share-sheet flow (Mail, Messages, etc.) covers it well enough that a dedicated in-app channel isn't worth building.
+
+### Round 2 — remaining 11 fixed, next build shipped, 5 more found on live re-test
+
+The rest of the original list landed the next day: input validation on the destination field, a warning when an imported booking falls outside a trip's date range, real seat-number support for group flights, native multi-select in the photo importer, and — the most structurally significant fix — **trip owners now get their own membership record**, closing a gap that had made "Trip Owner" show as a placeholder instead of a real name and that had forced more than a dozen special-case branches throughout the trip-detail screen.
+
+Testing the resulting build immediately surfaced five more real issues, all fixed the same day: a second, previously-missed code path around the destination-validation fix; travel-partner invites now flow directly from "save partner" into the share sheet instead of requiring a second separate step; a genuine "add to trip" action that silently did nothing under a specific navigation state; a "someone just joined your trip" banner that had been showing the wrong direction on the invitee's own device; and a stale-cache race that could show an empty itinerary on the Today screen despite bookings existing for that day.
+
+### Root-caused a recurring launch crash
+
+A crash that had been intermittently affecting TestFlight builds for several releases running was finally root-caused to a dependency-version mismatch between a font-loading library and the pinned React Native framework version — not a logic bug in the app's own code. Fixed by pinning the correct version and declaring it as a direct dependency instead of an indirect one. A temporary diagnostic error handler that had been added mid-investigation (useful for catching further TestFlight-only crashes, but never meant to reach real users) was removed cleanly before the eventual production build.
+
+### Monetization and Android groundwork closed out
+
+Landed and three-way reviewed: an offline-access bug fix (the entitlement check had been failing in the "safe" direction of *removing* access on any error or lost signal — exactly the condition a travel app's users hit most), the in-app purchase screen recovered from an earlier deletion, the AI transit-directions feature properly wired into the trip detail screen (previously built but not actually reachable in the app's navigation), and Android build scaffolding. **The purchase gate itself is not live yet** — this closed out preparation work, not the monetization launch.
+
+Separately, real departure/arrival clock times for flights were added — the earlier duration/layover fix only ever computed elapsed time, not actual times of day; this was the deliberately-scoped remaining half of that feature.
+
+### Shipped to the App Store
+
+The resulting build was submitted, approved by Apple, and went live — the current public version of Roam Wyld.
+
+### The long-scheduled internal refactor
+
+Separately from the defect work, the app's largest screen component (over 3,000 lines, everything from bookings to sharing to imports to maps living in one file) was fully broken apart into focused pieces — roughly ten extracted pieces of reusable logic and another dozen-plus extracted display components, plus shared date/formatting helpers consolidated into one place instead of being duplicated across the app. A subtle bug in the refactored booking-editing logic (state could freeze mid-edit under a specific timing condition) was caught and fixed as part of the same pass, before it ever reached a real build.
+
+### Regression suite: grew from 906/43 to over 1,000 tests across 48 suites through this window
+
+### Outstanding
+
+- One item from the original list — notifying a user when they've been removed from a trip — got the underlying data plumbing built but was deliberately left unwired to any screen, pending a decision on where it should surface. (Resolved in the next entry.)
+- Confirming Google's OAuth verification status before this went live wasn't explicitly re-checked at submission time — worth a deliberate look given the build already shipped.
+
+---
+
+## Reconciling a Five-Day Documentation Gap, Android Unblocked, Next-Phase Scope Set (August 25, 2026)
+
+**Context:** Five days of substantial work — three defect-fix batches, a production App Store release, and a full internal refactor (see the entry above) — had landed without a session log update, a real gap against this project's own "close every session with a written record" standard. A routine status check-in at the start of this session caught it before anything else started.
+
+### What the gap check found and fixed
+
+Five days of work existed only on the local machine — nothing had been pushed to the shared repository. Pushed everything first, then reconstructed and wrote up the missing session history (the entry above) from the commit trail and the founder's own testing notes, rather than letting it go undocumented. Confirmed the automated test suite was still fully green — actually re-ran it rather than trusting the last-recorded number — and it had grown further than recorded, so that baseline number got corrected too.
+
+### Android: the long-pending business registration cleared
+
+The D-U-N-S business identifier — applied for back in early July — has arrived, unblocking two things at once: registering Roam Wyld's Google Play account as an organization (which skips the closed-testing waiting period that personal accounts require) and switching the Apple Developer account from individual to business. Concrete next steps for the Android track: register the Play Console organization account, generate the Android-specific sign-in credentials Gmail import will need, and attempt a first real Android build now that the groundwork (package identifier, build profiles) from the prior session is in place.
+
+### Removed-from-a-trip notification, wired up
+
+The data plumbing for this had existed since mid-August but was never connected to a screen. Wired it to the main trip list: if a trip disappears from someone's account because the owner removed them (or they left on their own), a dismissible notice now explains what happened, instead of a trip silently vanishing with no explanation. Deliberately built as a purely local, already-cached-data signal — no new backend or push-notification infrastructure required, consistent with push notifications staying paused for now (see below).
+
+### Next-phase priorities reset
+
+With push notifications still paused and monetization not yet triggered by the usage thresholds in this roadmap's timeline, the founder redirected the next scoped phase toward making the itinerary experience itself smarter — chronological, gap-aware day views and basic scheduling-conflict detection — bundled alongside the previously-planned home-screen widget (or a trip-cover-photo fallback if a short feasibility spike doesn't clear the widget's native-build unknowns in time). A product-requirements pass scoped the itinerary work down to a buildable spec, and a technical feasibility read concluded the widget is plausible but genuinely uncertain within a short spike — recommending a firm early checkpoint rather than an open-ended attempt, with cover photos as the pre-agreed fallback if that checkpoint isn't cleared.
+
+### Outstanding
+
+- The itinerary-sophistication spec surfaced several product questions still needing a founder decision before build starts (how literally to compute "travel time" between bookings, whether scheduling suggestions should ever be system-generated versus purely passive, and where a couple of features should sit relative to the paid tier once monetization launches).
+- Google OAuth verification status — still pending, no change this session.
+- This showcase sync itself had fallen two sessions behind before today; keeping it current going forward remains a standing responsibility, not a one-time catch-up.

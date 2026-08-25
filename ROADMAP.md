@@ -90,6 +90,20 @@ Core group/couple mode already shipped (see What's Shipped above) — this is fu
 
 ---
 
+### Itinerary Sophistication (added 2026-08-25)
+
+*Currently scoped as the next active build phase, alongside the widget/cover-photos work below — pushed ahead of push notifications and monetization for now, since neither's trigger conditions have been hit yet.*
+
+| Feature | Priority | Detail |
+|---------|----------|--------|
+| Chronologically-sorted, gap-aware day view | High | A day's bookings render in actual time order with clear free-time gaps, instead of the order they were added in |
+| Basic scheduling-conflict detection | High | Flags when two bookings on the same day genuinely overlap in time, with a shortcut into editing either one |
+| Layover awareness improvements | Medium | Detects overnight/cross-midnight connections and manually-entered connecting flights, not just AI-imported same-day ones |
+
+Requirements were scoped down to a buildable spec, with a short list of founder decisions still open before build starts (see DEVLOG).
+
+---
+
 ### Held — Pending Founder Decision
 
 | Feature | Status | Detail |
@@ -100,17 +114,16 @@ Core group/couple mode already shipped (see What's Shipped above) — this is fu
 ---
 
 ### v1.4 — Pro Monetization Launch (Q4 2026)
-*All v1.0 founding cohort users permanently grandfathered at no charge.*
+*All v1.0 founding cohort users permanently grandfathered at no charge — pricing and gate scope updated 2026-08-25 to reflect the current plan.*
 
 | Decision | Detail |
 |----------|--------|
-| Pro gate | Gmail import only — everything else stays free |
-| Pricing | $4.99/mo · $29.99/yr |
-| Free trial | 14 days |
-| Founding cohort | All users who signed up before Pro launch get Pro forever |
-| Trigger | When data shows: 6+ bookings/trip cohort identified, Gmail import rate stable, D30 retention benchmarked |
+| Pro gate | Multiple concurrent trips, and AI/marginal-cost features (transit directions beyond the first trip, imports beyond a free allowance, unlimited Discover suggestions) — never anything safety-critical, offline-cached, or already free today |
+| Pricing | $5.99/mo · $39.99/yr, with a 90-day $29.99/yr launch promo |
+| Founding cohort | All users who signed up before the Pro cutoff get Pro forever, with an explicit in-app "you're a founder" acknowledgment before they ever see a price |
+| Status | Preparation work (recovered purchase-screen code, an offline-access bug fix, the grandfathering mechanism) is code-complete; the purchase gate itself is not live yet — deliberately not bundled into the current build |
 
-**Pricing rationale:** Wanderlog charges $39.99/yr for Gmail import. TripIt charges for smart parsing. Roam Wyld gates one feature, stays below both competitors, and lets all companion features (entry requirements, emergency info, offline access) remain free permanently.
+**Pricing rationale:** free stays a complete single trip; Pro is what a frequent, multi-trip traveler needs. Keeps every safety- and offline-related feature (entry requirements, emergency info, offline access, push reminders) free permanently, gating only volume and genuinely marginal-cost AI features.
 
 ---
 
@@ -168,7 +181,7 @@ Travel agents build itineraries for clients and deliver them directly to travele
 
 | Feature | Timeline | Detail |
 |---------|----------|--------|
-| Android | **In progress, targeted to begin mid-August 2026** (updated 2026-08-01) | React Native codebase is cross-platform. Work begins after the current iOS feature-update pass finishes; targeting Google Play (org account, no closed-testing gate) |
+| Android | **In progress** (updated 2026-08-25) | React Native codebase is cross-platform. Package scaffolding and build profiles are in place; the business registration needed for an organization Google Play account (no closed-testing gate) has now cleared, unblocking the next concrete steps: registering the Play Console account and a first real Android build attempt |
 | Outlook import | 2027 | Gmail covers the core persona; Outlook targets enterprise users — post-traction |
 | Affiliate revenue | Ongoing | Airalo (eSIM), SafetyWing (insurance), Wise (currency), iVisa (visa assistance) |
 
