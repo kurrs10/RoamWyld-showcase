@@ -2136,3 +2136,31 @@ With push notifications still paused and monetization not yet triggered by the u
 - The itinerary-sophistication spec surfaced several product questions still needing a founder decision before build starts (how literally to compute "travel time" between bookings, whether scheduling suggestions should ever be system-generated versus purely passive, and where a couple of features should sit relative to the paid tier once monetization launches).
 - Google OAuth verification status — still pending, no change this session.
 - This showcase sync itself had fallen two sessions behind before today; keeping it current going forward remains a standing responsibility, not a one-time catch-up.
+
+---
+
+## Session — 2026-08-19 through 2026-08-28 | v1.3 Live, Itinerary Sophistication Built, Test Coverage Hardened
+
+**Catch-up entry** — this sync had fallen behind again across several working sessions. Consolidating rather than reconstructing a day-by-day account.
+
+### v1.3 (Build 30) shipped and is live on the App Store
+
+The release bundles a large decomposition of the trip-detail screen (previously a single 3,000+ line file, now broken into ~10 focused hooks and ~13 presentational components — pure internal quality work, no user-visible change, but the kind of upkeep that keeps a fast-moving codebase safe to keep moving fast in), a fix for a stale-closure bug in the trip-editing flow, and a batch of manual QA defect fixes from the pre-launch sign-off pass.
+
+### Itinerary timeline got measurably smarter
+
+The day-by-day trip view now sorts bookings in actual chronological order instead of add-order, groups anything without a set time into its own "Anytime" section, and distinguishes a real free-time gap (30+ minutes, tappable for suggestions) from a too-short gap that isn't worth suggesting anything for. A rewritten layover-detection engine also fixes a bug where any third flight scheduled between two connecting legs would silently break the connection indicator — now it groups by the actual booked connection first, independent of what else is on the itinerary.
+
+This shipped alongside a full 12-specialist review pass (product, security, legal, mobile, data, App Store readiness, and QA all weighing in independently) that caught and fixed five real issues before they reached users — most notably a data-scoping bug where two different travelers' unrelated flights on a shared trip could get miscategorized as a connection to each other, which both the security and legal reviewers flagged independently by tracing the same code path from different angles. That kind of independent double-catch is exactly what running a full panel is for.
+
+### Instrumentation and test coverage followed, not skipped
+
+Three new analytics events now measure how often each of those new timeline patterns actually shows up in real trips (documented in METRICS.md's "Timeline Structure Metrics") — the idea being that a still-unbuilt smarter-suggestions feature shouldn't get built until there's real data on whether the underlying pattern (long unscheduled gaps in an itinerary) is common enough to be worth solving.
+
+A hands-on scripted-test pass for the new timeline UI surfaced a genuinely interesting platform quirk along the way: Android's on-device text classifier was intercepting taps intended for a date-picker button, because it recognized the displayed date text as a "smart" tappable entity in its own right. Fixed by giving the button a stable internal identifier the test suite can target directly instead of tapping the text itself — the kind of small, unglamorous fix that only turns up when you actually drive the UI end-to-end rather than trusting that the code "should" work.
+
+### Outstanding
+
+- A related, more subtle timing flake in the same test suite (a picker dialog occasionally not closing cleanly) is still open — documented candidly rather than worked around, with next steps recorded for whoever picks it up.
+- A manual pass on a real device for the new timeline UI is scheduled for next week.
+- Google OAuth verification for Gmail import remains the standing blocker on this app leaving "Testing" publishing status — unchanged this round.

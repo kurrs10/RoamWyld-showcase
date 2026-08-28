@@ -184,6 +184,21 @@ PostHog complement: track session starts for denominator
 
 ---
 
+### 13. Timeline Structure Metrics
+**Added 2026-08-25** (data-analyst-caught gap during a feature review — instrumented the same session, not deferred). **Definition:** how often the itinerary timeline's structural features (Anytime grouping, layover detection, different-city notes) actually show up, to validate whether they're worth their engineering investment and whether a future auto-suggestion engine would be solving a frequent problem.
+
+| Event | Trigger | Key Properties |
+|-------|---------|---------------|
+| `anytime_section_rendered` | Trip-detail view loads with ≥1 untimed booking anywhere in the trip | `tripId`, `anytimeBookingCount: number` |
+| `layover_divider_rendered` | Layover pairing produces ≥1 pair that renders | `tripId`, `pairingTier: 'connection_group_id'\|'heuristic'`, `minutesBetween: number` |
+| `different_city_note_shown` | A different-city transition fires ≥1 time in the trip | `tripId`, `noteCount: number` |
+
+**Caveat, not a data artifact:** `different_city_note_shown`'s rate is not reliable ground truth for "how often trips are actually multi-city" — the underlying destination match is a known-imprecise fuzzy text match, flagged during the same review. This metric measures the note's fire-rate given that imprecision, not real multi-city frequency, until the matching itself is tightened.
+
+**How to apply:** `anytime_section_rendered`'s count is a direct go/no-go input for whether a future auto-suggestion engine would solve a frequent pattern or a rare edge case — check this before investing in that feature.
+
+---
+
 ## Implementation Notes
 
 ### PostHog Setup (React Native)

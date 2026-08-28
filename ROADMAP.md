@@ -1,6 +1,6 @@
 # Roam Wyld — Product Roadmap
 
-**Status:** Live on the App Store — v1.1 shipped July 2026
+**Status:** Live on the App Store — v1.3 (Build 30) shipped August 2026
 
 ---
 
