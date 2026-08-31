@@ -20,7 +20,7 @@ Individually, partial versions exist (Rome2Rio for routing, Sherpa for visa info
 
 | Feature | Roam Wyld | Tripsy Pro | TripIt Pro | CheckMyTrip | Mindtrip |
 |---|---|---|---|---|---|
-| Pricing | $4.99/mo · $29.99/yr | $9.99/mo · $59.99/yr | $48.99/yr | Free | Free |
+| Pricing | **$1.99/mo · $9.99/yr** (launch; increases later) | $9.99/mo · $59.99/yr | $48.99/yr | Free | Free |
 | App Store rating | Target 4.5+ | 4.7★ (4,766 ratings) | 4.8★ (298K ratings) | ~4.0★ | New |
 | Gmail import (OAuth, no forwarding) | Yes | No (forward-to only) | Yes (auto-scan) | No | No |
 | Offline — full itinerary | Yes | Yes | Partial | Partial | No |
@@ -48,7 +48,7 @@ Individually, partial versions exist (Rome2Rio for routing, Sherpa for visa info
 1. **Schengen 90/180 tracker** — zero competitors have it; digital nomads and long-stay EU travelers have no app solution today
 2. **Offline visa + entry requirements** — TripIt has visa info but requires internet; at a border with no data, Roam Wyld works, TripIt shows a loading spinner
 3. **Live booking validation** — B2B fraud tech brought to consumers; no consumer app validates flight numbers against AviationStack
-4. **Price vs. value** — $29.99/yr vs. Tripsy $59.99/yr with a stronger feature set for international travelers
+4. **Price vs. value** — $9.99/yr launch price vs. Tripsy $59.99/yr / TripIt Pro $48.99/yr, with a stronger feature set for international travelers
 5. **Hiking / hut-to-hut trail persona (added 2026-08-02)** — Discover now surfaces trail systems and multi-day hut-to-hut routes as legitimate suggestions, not just restaurants and city sights. Multi-day trail travel is a growing segment none of the competitor set designs for explicitly.
 
 ### Where Roam Wyld Has Gaps (v1.1 Targets)
@@ -109,33 +109,30 @@ Everything is free for the founding cohort. No trial, no paywall, no expiration.
 
 **v1.4 — Pro Tier (planned Q4 2026)**
 
-All founding cohort users (signed up before Pro launch) are permanently grandfathered — no charge, no expiration.
+Every account created on or before the cutoff (2026-08-31) is permanently grandfathered — every feature free forever, unconditionally, including future AI features, with no paywall or upsell ever.
 
-- **Pro gate:** Gmail Import only — everything else stays free forever
-- **Pricing:** $4.99/month · $29.99/year
-- **Free trial:** 14 days
-- **Pricing rationale:** Wanderlog charges $39.99/yr for Gmail import; TripIt charges for smart parsing. Roam Wyld gates one feature, stays below both competitors, and lets all companion features (entry requirements, emergency info, offline access) remain free permanently.
+- **Pricing:** $1.99/month · $9.99/year, 14-day free trial, no launch promo
+- **Pro gate:** unlimited AI — unlimited Gmail/PDF imports, unlimited transit-direction generations, unlimited Discover, and the planned AI Travel Agent
+- **Free tier:** a complete trip — unlimited trips, all safety/offline features, 10–15 imports per trip, full transit directions on the first trip. Trip count is not gated.
 
 ### Pricing Strategy
 
-**Current pricing: $4.99/month · $29.99/year** (set at App Store submission, June 25, 2026)
+**Launch pricing (finalized 2026-08-31): $1.99/month · $9.99/year, 14-day free trial, no promo.**
 
-- Annual plan is the headline offer
-- 14-day free trial on both plans
-- Market context: Tripsy Pro $59.99/yr, TripIt Pro $48.99/yr — Roam Wyld undercuts both despite stronger feature set for international travelers
+The category runs $39.99–$59.99/yr (Wanderlog $39.99, TripIt Pro $48.99, Tripsy Pro $59.99). Roam Wyld launches at roughly a fifth of that — a deliberate bet that at a near-impulse price the goal is downloads, reviews, and word of mouth, not early revenue. The paid tier is aligned to real per-use cost (the Claude API calls behind import and AI features), not to friction, so trip count and other zero-marginal-cost features stay free.
 
 **Pricing evaluation schedule (do NOT change pricing before completing this data review):**
 
 | Checkpoint | What to evaluate | Potential action |
 |---|---|---|
-| 30 days post-launch | Trial-to-paid conversion rate vs. 48.7% travel app benchmark | Hold or adjust |
-| 60 days post-launch | Annual vs. monthly split (target: 60%+ annual) | Hold or adjust |
-| 90 days post-launch | Churn rate, LTV estimate, review sentiment on price | Consider raise to $39.99/yr |
-| 120 days post-launch | Full cohort data — paid CAC vs. LTV if any paid acquisition tested | Final pricing decision |
+| 30 days post-launch | Trial-to-paid conversion rate vs. 48.7% travel app benchmark | Hold |
+| 60 days post-launch | Annual vs. monthly split; download + review velocity | Hold |
+| 90 days post-launch | Churn, LTV estimate, review sentiment on price, user-base size | First price-increase decision |
+| 120 days post-launch | Full cohort data — paid CAC vs. LTV | Confirm increase / regional pricing |
 
-**When to raise to $39.99/yr:** Research shows $29.99/yr is below market floor vs. competitors. However, raise only after 90+ days of conversion data. If trial-to-paid is above 40% and churn is below 5%/month, a raise to $39.99 is justified and keeps Roam Wyld $20 below Tripsy while capturing more value.
+**Raise-later path:** first increase is one step — toward ~$2.99/mo · ~$19.99/yr — once there's a user base and conversion data (still less than half of every competitor). A price increase affects new subscribers only; existing subscribers keep their rate, and grandfathered accounts are unaffected regardless. Regional/PPP pricing follows the first increase.
 
-**Free trial:** 14 days on annual. Travel apps convert at 48.7% median trial-to-paid — the product just needs enough time to show value across a planning cycle.
+**Free trial:** 14 days, both plans. Travel apps convert at 48.7% median trial-to-paid — the product needs enough time to show value across a planning cycle.
 
 ### Group Invite Viral Loop
 
@@ -190,12 +187,9 @@ Register for Airalo affiliate program before Phase 4 ends — approval takes a f
 | 1,000 users | Review PostHog conversion data; adjust tier if needed before paid acquisition |
 | Post-launch | Consider Family/Teams tier if group invite rate > 30% |
 
-### Revenue Model (Year 1 Estimate at 5,000 Users)
+### Revenue Model
 
-- 15% Pro conversion → 750 × $24.99 = **$18,742/yr**
-- Airalo affiliate (20% of Pro, ~$2 avg) → **$300/yr**
-- Insurance affiliate (5% of Pro, ~$15 avg) → **$562/yr**
-- **Total: ~$19,600/yr** — covers Claude API costs; validates model before paid acquisition
+Year 1 is explicitly not a revenue year — the launch price ($9.99/yr) is set for user-base growth and reviews ahead of a later price increase, not ARPU. Affiliate revenue (Airalo eSIM, travel insurance) runs alongside and helps cover Claude API costs during the low-price window. The revenue model gets rebuilt around the raised price once there's conversion data.
 
 ---
 
@@ -203,14 +197,13 @@ Register for Airalo affiliate program before Phase 4 ends — approval takes a f
 
 ### First 90 Days — Organic Only
 
-**Do NOT run paid acquisition in the first 90 days.** At $29.99/yr, industry CAC of $30–200/subscriber makes paid channels break-even to negative LTV. All budget goes to organic until pricing is validated.
+**Do NOT run paid acquisition in the early months.** At $9.99/yr, industry CAC of $30–200/subscriber makes paid channels deeply unprofitable. All growth is organic — word of mouth, the group-invite loop, and content — until the price has been raised and validated.
 
 ### Priority Channel Ranking
 
-**1. Setapp Distribution (apply Week 1)**
-Setapp is a Mac/iOS app subscription bundle — users pay $9.99/month and get access to 240+ apps. Tripsy is already on it. Accepted apps get passive discovery from 300K+ power users who are already subscription-comfortable and Apple-native. No CAC. Apply at setapp.com/developers. Acceptance typically takes 2–4 weeks.
+**Setapp — evaluated, not pursued.** Setapp is Mac-first and does not distribute iOS-only apps; getting in would require building and maintaining a macOS build, which isn't worth it for this app's target traveler. Setapp Mobile itself was also discontinued in early 2026. Off the roadmap.
 
-**2. Reddit Communities (authentic, not promotional)**
+**1. Reddit Communities (authentic, not promotional)**
 Target: r/solotravel (7M members), r/digitalnomad (2M members), r/travel (7M members).
 - Do NOT post "check out my app" — this gets removed and damages reputation
 - Reply to existing threads where people ask about Schengen tracking, trip organization, entry requirements

@@ -131,7 +131,7 @@ See [DEVLOG.md](DEVLOG.md) for the full build log with decisions, tradeoffs, and
 
 **v1.1 — Gmail import improvements shipped July 2026.** Expanded airline coverage (80+ carriers), itinerary email parsing, trash/spam exclusion, and improved scoring. All features remain free.
 
-**v1.4 — Pro monetization.** Gmail Import will move behind a Pro subscription ($4.99/mo or $29.99/yr). All users who signed up during v1.0 will be permanently grandfathered into Pro — no charge, ever.
+**v1.4 — Pro monetization.** A Pro subscription ($1.99/mo · $9.99/yr, 14-day trial) unlocks unlimited AI — unlimited Gmail/PDF imports (free tier: 10–15 per trip), unlimited transit-direction generation, and the planned AI Travel Agent. A complete trip stays free: unlimited trips, all safety and offline features. Every account created before the cutoff is permanently grandfathered — every feature free forever, no charge, ever.
 
 ---
 

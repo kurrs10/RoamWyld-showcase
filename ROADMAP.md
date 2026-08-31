@@ -114,16 +114,16 @@ Requirements were scoped down to a buildable spec, with a short list of founder 
 ---
 
 ### v1.4 — Pro Monetization Launch (Q4 2026)
-*All v1.0 founding cohort users permanently grandfathered at no charge — pricing and gate scope updated 2026-08-25 to reflect the current plan.*
+*Pricing and gate scope finalized 2026-08-31 after a competitive teardown of the travel-app category.*
 
 | Decision | Detail |
 |----------|--------|
-| Pro gate | Multiple concurrent trips, and AI/marginal-cost features (transit directions beyond the first trip, imports beyond a free allowance, unlimited Discover suggestions) — never anything safety-critical, offline-cached, or already free today |
-| Pricing | $5.99/mo · $39.99/yr, with a 90-day $29.99/yr launch promo |
-| Founding cohort | All users who signed up before the Pro cutoff get Pro forever, with an explicit in-app "you're a founder" acknowledgment before they ever see a price |
-| Status | Preparation work (recovered purchase-screen code, an offline-access bug fix, the grandfathering mechanism) is code-complete; the purchase gate itself is not live yet — deliberately not bundled into the current build |
+| Pricing | **$1.99/month · $9.99/year, 14-day free trial, no launch promo.** Deliberately priced well below the category (competitors run $39.99–$59.99/yr) to prioritize downloads, reviews, and word of mouth over early revenue; a measured price increase follows once there's a user base, affecting new subscribers only. |
+| Pro gate | Unlimited AI: unlimited Gmail/PDF imports, unlimited transit-direction generations, unlimited Discover, and the planned AI Travel Agent. Free covers a complete trip — **unlimited trips**, all safety/offline features, 10–15 imports per trip, and full transit directions on the first trip. Trip count is not gated. |
+| Founding cohort | Every account created on or before the cutoff (2026-08-31) gets **every feature free forever, unconditionally** — including future AI features — with no paywall or upsell ever, and an in-app "you're a founder" acknowledgment. |
+| Status | Preparation work (purchase screen, the grandfathering mechanism, an offline-access fix) is code-complete; the purchase gate itself is not live yet — deliberately not bundled into the current build. |
 
-**Pricing rationale:** free stays a complete single trip; Pro is what a frequent, multi-trip traveler needs. Keeps every safety- and offline-related feature (entry requirements, emergency info, offline access, push reminders) free permanently, gating only volume and genuinely marginal-cost AI features.
+**Gate philosophy:** at a near-impulse price the paid tier is aligned to real per-use cost (the Claude API calls behind import and AI features), not to friction. Everything safety-critical, offline, or already-owned stays free permanently.
 
 ---
 
@@ -194,7 +194,7 @@ Travel agents build itineraries for clients and deliver them directly to travele
 | Monitor usage patterns | v1.0 launch → 30 days |
 | Evaluate trial-to-paid conversion | 30/60/90/120-day checkpoints |
 | Pro gate activation | When founding cohort data supports pricing confidence |
-| Pricing review | $29.99/yr → potentially $39.99/yr after 90-day data |
+| First price increase | $9.99/yr → ~$19.99/yr once there's a user base and 90-day conversion data — new subscribers only; existing and grandfathered users unaffected |
 
 ---
 

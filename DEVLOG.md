@@ -2164,3 +2164,33 @@ A hands-on scripted-test pass for the new timeline UI surfaced a genuinely inter
 - A related, more subtle timing flake in the same test suite (a picker dialog occasionally not closing cleanly) is still open — documented candidly rather than worked around, with next steps recorded for whoever picks it up.
 - A manual pass on a real device for the new timeline UI is scheduled for next week.
 - Google OAuth verification for Gmail import remains the standing blocker on this app leaving "Testing" publishing status — unchanged this round.
+
+---
+
+## Session — 2026-08-31 | Pricing finalized, a defect closed, Decision 2 built, testing plans set
+
+### Pro pricing finalized after a competitive teardown
+
+A fresh look at what the travel-app category actually charges — Wanderlog $39.99/yr, TripIt Pro $48.99/yr, Tripsy Pro $59.99/yr, most with a 7-day trial — informed a deliberate call to launch **well below the market: $1.99/month · $9.99/year, 14-day free trial, no launch promo.** The reasoning: at a near-impulse price the launch goal is downloads, reviews, and word of mouth, not revenue; a measured one-step price increase (~$19.99/yr) follows once there's a real user base and conversion data, and it only ever affects new subscribers.
+
+The paid tier was also reframed. Instead of gating one feature (the earlier "Gmail import only" plan), Pro is **unlimited AI** — unlimited imports, unlimited transit-direction generation, unlimited Discover, and the planned AI Travel Agent — because at this price the sensible line is real per-use cost (the AI API calls), not friction. A complete trip stays free, including unlimited trips; the free import allowance is 10–15 per trip. Every account created on or before the cutoff is grandfathered **free forever, unconditionally** — including future AI features, with no paywall or upsell ever.
+
+### A trip-form validation gap closed
+
+Typing a place name that isn't recognized and then saving the trip without formally adding it used to skip the gentle "we don't recognize this — add anyway?" check that the add button already showed. Closed by routing the save path through the same check. Small fix, real edge case, covered with tests.
+
+### "Suggest a time" for unscheduled activities — built, kept dark
+
+The itinerary view's "Anytime" section (activities with no set time) now has an optional feature: a one-tap chip that proposes a specific start time by finding the first open daytime slot that doesn't collide with anything already scheduled. It's rule-based — no AI, no API cost — and deliberately narrow: it suggests *when* to do something you already added, which is a different thing from the planned AI Travel Agent that suggests *what* to do.
+
+It ships **behind a flag that's off**, because the honest answer to "is this worth turning on?" needs data the current analytics can't yet provide (there's no clean baseline for how often trips even have unscheduled activities). The plan: add that measurement, then decide at 30 days or at launch scale. Two QA passes on the code found and fixed a real bug — a malformed time string from an imported email could produce a nonsense suggested time — before sign-off.
+
+### Testing plans, on a zero budget
+
+Two written plans this session. **Android automated testing** (no Android device, no manual QA possible): unit coverage of every platform-specific code path, the scripted end-to-end suite running on an emulator in CI, Firebase Test Lab's free tier for real-device smoke checks, and volunteer testers on the Play Console internal track as the human backstop — no paid device farm, no device purchase. **Decision 2 rollout** is gated on the analytics work above.
+
+### Outstanding
+
+- The "suggest a time" feature stays flagged-off pending the analytics baseline.
+- A manual real-device pass on the timeline UI is still owed.
+- Google OAuth verification for Gmail import remains the standing blocker on leaving "Testing" publishing status — a fresh reply was sent this week asking the reviewer for specifics.

@@ -27,16 +27,12 @@ A record of the significant product decisions made during the build: what was ch
 
 ---
 
-### v1.1 Pro Strategy: Gmail Import Only
-**Decision:** When monetization launches in v1.1, gate only Gmail Import behind Pro. All other features remain free.
-**Rejected:** Gating entry requirements, transit directions, or multiple features simultaneously.
-**Why:** One clear Pro feature that demonstrably saves time is more persuasive than a feature list. Gmail Import is the right choice because:
-- Competitors charge for it (Wanderlog $39.99/yr, TripIt smart version)
-- It replaces obvious manual effort (copying 15+ confirmation emails by hand)
-- Users become dependent on it after one use — creates natural upgrade pressure
-- Everything else Roam Wyld offers is expected free across all competitors
+### Pro Strategy
+**Original decision (June 2026):** gate only Gmail Import behind Pro; one clear feature that demonstrably saves time is more persuasive than a feature list, and competitors already charge for it (Wanderlog $39.99/yr).
 
-**v1.1 Pro pricing (planned):** $4.99/mo or $29.99/yr (50% savings). Revisit after v1.0 data.
+**Superseded 2026-08-31, after a competitive teardown of the whole category:** the gate is **unlimited AI** — unlimited Gmail/PDF imports (free allowance: 10–15 per trip), unlimited transit-direction generations, unlimited Discover, and the planned AI Travel Agent. Rationale: at a near-impulse launch price the paid tier should track real per-use cost (the Claude API calls), not gate a single feature. Everything safety-critical, offline, or zero-marginal-cost (including trip count) stays free.
+
+**Pro pricing:** $1.99/mo · $9.99/yr, 14-day trial, no promo — deliberately far below the $39.99–$59.99/yr category to prioritize growth; a one-step increase (~$19.99/yr) follows once there's conversion data, new subscribers only. Every pre-cutoff account is grandfathered free forever, unconditionally.
 
 ---
 

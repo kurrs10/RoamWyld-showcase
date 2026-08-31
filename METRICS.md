@@ -195,7 +195,7 @@ PostHog complement: track session starts for denominator
 
 **Caveat, not a data artifact:** `different_city_note_shown`'s rate is not reliable ground truth for "how often trips are actually multi-city" — the underlying destination match is a known-imprecise fuzzy text match, flagged during the same review. This metric measures the note's fire-rate given that imprecision, not real multi-city frequency, until the matching itself is tightened.
 
-**How to apply:** `anytime_section_rendered`'s count is a direct go/no-go input for whether a future auto-suggestion engine would solve a frequent pattern or a rare edge case — check this before investing in that feature.
+**How to apply:** `anytime_section_rendered`'s count is a direct go/no-go input for the "suggest a time" feature (built 2026-08-31, kept behind an off flag). That feature stays dark until the instrumentation can actually answer whether long unscheduled gaps are common enough to be worth a dedicated interaction — the current event lacks a clean baseline (it only fires when the count is already non-zero, and it counts booking types the feature doesn't address). Next step: a trip-load event that fires regardless of count.
 
 ---
 
