@@ -127,6 +127,12 @@ Requirements were scoped down to a buildable spec, with a short list of founder 
 
 ---
 
+### Email-forwarding import (designed 2026-09-01, ~3 build sessions)
+
+Customers forward booking confirmation emails to a per-trip, per-person address; a server function parses them with the same AI extraction the app already uses, and stages the result for the user's review on next app open. This is the category-standard import mechanism — TripIt, Tripsy, Wanderlog and KAYAK all work this way — and it means booking import no longer depends on a third-party OAuth verification process. Works identically on iOS and Android (no per-platform OAuth client). Design + provider evaluation (Resend, inbound-only) went through an engineer + architect review; the auth model is a per-person capability token, not sender-address matching, and nothing auto-adds — every forwarded import passes through the user's review step first.
+
+---
+
 ### v1.5 — Content & Export (Q4 2026)
 
 | Feature | Priority | Detail |

@@ -2194,3 +2194,19 @@ Two written plans this session. **Android automated testing** (no Android device
 - The "suggest a time" feature stays flagged-off pending the analytics baseline.
 - A manual real-device pass on the timeline UI is still owed.
 - Google OAuth verification for Gmail import remains the standing blocker on leaving "Testing" publishing status — a fresh reply was sent this week asking the reviewer for specifics.
+
+---
+
+## Session — 2026-09-01 | Email-forwarding import designed; monetization + Decision-2 follow-ups
+
+### Booking import no longer depends on Google
+
+Gmail's OAuth verification has been stuck for months with no resolution and a likely paid security audit at the end of it. Rather than keep waiting, we designed **email-forwarding import** — the mechanism every established travel app uses (TripIt has done it since 2007). The customer forwards a confirmation email to a private per-trip address; the server pulls the bookings out with the same AI parser the app already runs, and shows them in the existing review screen next time the app opens. Nothing is added automatically.
+
+The design went through a two-agent review (an implementation-feasibility pass and an architecture pass). Outcomes worth noting: the provider choice landed on a single lightweight service for receiving mail, added on a subdomain so the live marketing site and existing email are untouched; the trust model is a per-person secret address that *is* the credential (so you can forward from any of your email accounts, not just the one you signed up with); and unreviewed imports are held as parsed data rather than as real bookings, so there's zero chance of a not-yet-approved entry showing up anywhere in the app. Gmail one-tap connect stays as an optional extra for people who want it.
+
+### Also this session
+
+- Monetization finalized: a deliberately low launch price to prioritise growth over revenue, with a planned increase once there's a user base; every pre-launch account grandfathered free forever.
+- The "suggest a time" itinerary feature (built earlier, kept behind an off switch) had its interaction details confirmed and reworked — it now opens a pre-filled time picker you can adjust rather than committing a guess, and handles activities that don't have a date yet. Still off pending the measurement work that tells us whether it's worth turning on.
+- Android testing plan settled on a zero-budget path (automated coverage + a cloud device-test free tier), with an "early access" disclaimer for the store listing since there's no in-house Android device.
