@@ -2210,3 +2210,19 @@ The design went through a two-agent review (an implementation-feasibility pass a
 - Monetization finalized: a deliberately low launch price to prioritise growth over revenue, with a planned increase once there's a user base; every pre-launch account grandfathered free forever.
 - The "suggest a time" itinerary feature (built earlier, kept behind an off switch) had its interaction details confirmed and reworked — it now opens a pre-filled time picker you can adjust rather than committing a guess, and handles activities that don't have a date yet. Still off pending the measurement work that tells us whether it's worth turning on.
 - Android testing plan settled on a zero-budget path (automated coverage + a cloud device-test free tier), with an "early access" disclaimer for the store listing since there's no in-house Android device.
+
+---
+
+## Session — 2026-09-18 | Security/privacy review of email-forwarding import; a real trip-language bug fixed
+
+### Email-forwarding import: full review pass before it goes anywhere near real users
+
+Before the email-forwarding design from earlier this month can ship, it went through a dedicated database, privacy, and security review — standard practice for anything touching how bookings get into a trip. The review surfaced a handful of must-fix items, all addressed in the same session: a row-level permission gap that could have let one account read another trip's unreviewed forwarded bookings, tighter credential strength for the private forwarding address, a way to reset that address if it's ever shared with the wrong person, and a retention/disclosure update so the forwarding provider is properly named in the privacy policy. None of this was live or reachable by any real user — it was caught in review on a feature that hasn't shipped yet, which is exactly when you want to catch it.
+
+### A real bug, fixed: trip language info wasn't matching real trips
+
+The in-app phrase-of-the-day and translate quick-access were silently failing to find language data for every real trip, because trips are stored as "Paris, France" and the lookup was only matching bare country names. Fixed by reusing the same city-to-country resolver the Entry Requirements feature already relies on. Small, well-tested fix — the kind that's invisible until you notice every trip showed a dead-end message instead of a helpful phrase.
+
+### Also this session
+
+- A full product/QA release review confirmed today's build is ready to go out — the language fix above plus the Phase 9 itinerary-sorting work and a handful of Gmail/Android corrections from earlier this month, all previously reviewed.
