@@ -2213,6 +2213,51 @@ The design went through a two-agent review (an implementation-feasibility pass a
 
 ---
 
+## Session — 2026-09-08 | Gmail import disclosures made exactly accurate; email-forwarding build plan
+
+### Saying exactly what Gmail import does, no more and no less
+
+A review of the Gmail import consent screen found it described the feature more broadly than the code behaves. The wording now matches the code exactly: the real search window (from several months before a trip to shortly after it), the real per-email text limit, and a plain statement that email attachments aren't parsed. The same pass fixed a small real bug, where the connected-Gmail label in Settings went blank after the access token refreshed. It also deleted a dead, never-shipped feature along with its tests.
+
+### Email-forwarding import: from design to build plan
+
+The design locked on 9/01 became an executable build plan covering the database tables, the shared parsing modules, and how the same AI extraction serves both the existing Gmail path and the new forwarded-email path. With the plan written, the build sessions can follow the spec instead of re-deciding it.
+
+---
+
+## Session — 2026-09-15 | v1.4 release prep, cover photos chosen over the widget, Android listing drafted
+
+### v1.4 release prep
+
+- Added the analytics event needed for an honest go/no-go on the itinerary "Suggest a time" feature, which is built but switched off. It fires once per real trip visit, so the metric's denominator can be trusted.
+- For Android: an early-access disclaimer in the app, and Gmail import hidden entirely until Android has its own OAuth setup. Hiding it beats showing a button that doesn't work.
+- A whole-release product review caught a double-tap edge case in two save flows. Both now use the app's existing shared submit guard rather than hand-rolled copies.
+- An 11-role review panel ran against the whole release and all 11 gave GO. It also caught a real issue before shipping: the upgrade screen listed Gmail import as a perk on Android, where it isn't available. That line is now filtered out on Android.
+
+### Cover photos over the widget, for now
+
+An engineering feasibility pass and a product spec pass ran side by side. Cover photos won: they reuse dependencies the app already has and show on every trip-list view, while the widget would be the app's first native extension and only reaches people who add it. The widget is deferred, not shelved. The spec follows the app's existing booking-visibility model: each trip member sets their own cover photo, choosing private or shared.
+
+The privacy and database reviews **reversed the original "public storage bucket" plan**. A public bucket only makes a private photo unlisted, not access-controlled, and a leaked link could never be revoked. Photos will go in a private bucket, with access tracking each photo's own visibility and trip membership. A follow-up security pass found more issues in the draft schema that must be fixed before it's applied, so it remains a draft.
+
+### Android store listing drafted
+
+Store description and a Data safety answer key, both derived from the app's actual dependencies rather than guessed.
+
+---
+
+## Session — 2026-09-16 | Full automated regression run against v1.4; email-forwarding tests completed
+
+### Running the whole end-to-end suite before any manual testing
+
+The goal: automated coverage good enough that the founder's own device pass is a spot-check, not a bug hunt. A newer local Xcode broke local simulator builds in three separate ways, so the release candidate was built in the cloud on the same pinned toolchain production builds use, and installed straight onto the simulator. The full end-to-end suite then turned up six real bugs, **all in the test scripts, none in the app**. That prompted a short retro on why the scripts had drifted.
+
+### Email-forwarding import: implementation brought up to its test plan
+
+The implementation existed but was missing most of the test suites its build plan called for. Five suites were written (95 tests), including signature-verification tests checked against an independent implementation rather than re-deriving the same computation. QA confirmed the tests exercise real logic, not mocks. The branch was merged with its earlier draft and pushed, still unreleased.
+
+---
+
 ## Session — 2026-09-18 | Security/privacy review of email-forwarding import; a real trip-language bug fixed
 
 ### Email-forwarding import: full review pass before it goes anywhere near real users
@@ -2226,3 +2271,22 @@ The in-app phrase-of-the-day and translate quick-access were silently failing to
 ### Also this session
 
 - A full product/QA release review confirmed today's build is ready to go out — the language fix above plus the Phase 9 itinerary-sorting work and a handful of Gmail/Android corrections from earlier this month, all previously reviewed.
+
+---
+
+## Session — 2026-09-22/23 | v1.4 approved and live; website updated; Google Play setup begins
+
+### v1.4 is on the App Store
+
+The release cleared on 9/18 was confirmed to be exactly the reviewed code, by matching the upload time against the last commit. It was submitted on 9/22 and approved by Apple on 9/23. What users get: each day's itinerary sorted in true time order with an "Anytime" section for untimed plans, correct layovers for overnight and connecting flights, a fixed phrase-of-the-day/Translate for real trips, a notice when you're removed from a shared trip, and a destination-saving fix.
+
+### Keeping public claims honest
+
+The app's own rule is that release notes and every feature claim get updated in the same session as a release build. That check found the README still claiming Outlook import, which was never built, so the claim was removed. It also found the privacy policy didn't mention PDF/photo import, even though those documents are sent to the AI provider for extraction (and not stored). The policy now says so. The website's release notes and feature copy went live the moment Apple approved the release, not before.
+
+### Google Play: first steps
+
+- The original Android package name turned out to be taken on Google Play. Android now uses a name based on the app's own domain; iOS is unchanged, and QA confirmed nothing else depended on it.
+- A public account-deletion page went live. It covers in-app deletion, an email request for people who no longer have the app, and exactly what is and isn't deleted. Google Play requires this.
+- The Play Console setup began, with the Data safety form answered from the code and the privacy policy rather than from memory. One answer was caught and corrected before submission: all data is encrypted in transit.
+

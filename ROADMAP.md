@@ -1,6 +1,6 @@
 # Roam Wyld — Product Roadmap
 
-**Status:** Live on the App Store — v1.3 (Build 30) shipped August 2026
+**Status:** Live on the App Store — v1.4 (Build 34) approved September 23, 2026
 
 ---
 
@@ -88,6 +88,16 @@ Core group/couple mode already shipped (see What's Shipped above) — this is fu
 | Per-person booking assignment | Medium | Assign specific bookings to each traveler |
 | Pre-trip checklist with per-person tasks | Medium | Packing, visa tasks, etc. assigned to each person |
 
+### v1.4 — Smarter Day-by-Day Itinerary (September 2026)
+
+| Feature | Detail |
+|---------|--------|
+| Chronological day view | Each day's bookings sort in true time order, with an "Anytime" section for plans without a set time |
+| Cross-midnight layovers | Overnight and connecting flights show layover info correctly, including manually entered connections |
+| Phrase of the day / Translate fix | Now works for trips entered as "City, Country" (previously a silent dead end on every real trip) |
+| Removed-from-trip notice | You're told when a trip owner removes you from a shared trip |
+| Android groundwork | Early-access disclaimer, and Gmail import hidden on Android until it has its own OAuth setup |
+
 ---
 
 ### Itinerary Sophistication (added 2026-08-25)
@@ -96,9 +106,9 @@ Core group/couple mode already shipped (see What's Shipped above) — this is fu
 
 | Feature | Priority | Detail |
 |---------|----------|--------|
-| Chronologically-sorted, gap-aware day view | High | A day's bookings render in actual time order with clear free-time gaps, instead of the order they were added in |
+| Chronologically-sorted, gap-aware day view | High | ✅ Shipped in v1.4 |
 | Basic scheduling-conflict detection | High | Flags when two bookings on the same day genuinely overlap in time, with a shortcut into editing either one |
-| Layover awareness improvements | Medium | Detects overnight/cross-midnight connections and manually-entered connecting flights, not just AI-imported same-day ones |
+| Layover awareness improvements | Medium | ✅ Shipped in v1.4 |
 
 Requirements were scoped down to a buildable spec, with a short list of founder decisions still open before build starts (see DEVLOG).
 
@@ -113,7 +123,7 @@ Requirements were scoped down to a buildable spec, with a short list of founder 
 
 ---
 
-### v1.4 — Pro Monetization Launch (Q4 2026)
+### Pro Monetization Launch (Q4 2026)
 *Pricing and gate scope finalized 2026-08-31 after a competitive teardown of the travel-app category.*
 
 | Decision | Detail |
@@ -187,7 +197,7 @@ Travel agents build itineraries for clients and deliver them directly to travele
 
 | Feature | Timeline | Detail |
 |---------|----------|--------|
-| Android | **In progress** (updated 2026-08-25) | React Native codebase is cross-platform. Package scaffolding and build profiles are in place; the business registration needed for an organization Google Play account (no closed-testing gate) has now cleared, unblocking the next concrete steps: registering the Play Console account and a first real Android build attempt |
+| Android | **In progress** (updated 2026-09-23) | Organization Google Play account is live (no closed-testing gate), the first Android build compiles, and the Play Console listing and Data safety form are underway. Android launches free, with Gmail import hidden until it has its own OAuth setup. Next: store graphics, then the first build uploaded to internal testing |
 | Outlook import | 2027 | Gmail covers the core persona; Outlook targets enterprise users — post-traction |
 | Affiliate revenue | Ongoing | Airalo (eSIM), SafetyWing (insurance), Wise (currency), iVisa (visa assistance) |
 
