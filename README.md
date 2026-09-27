@@ -1,7 +1,7 @@
 # Roam Wyld
 [![Visitors](https://hits.sh/github.com/kurrs10/RoamWyld-showcase.svg?style=flat&label=visitors&color=4A90D9)](https://hits.sh/github.com/kurrs10/RoamWyld-showcase/)
 
-**Your trip. Any country. No WiFi needed.**
+**Your trip, in one place.**
 
 > Live on the App Store — July 2026  
 > Built by [Kirsten Evans](https://www.kirstenmoberly.com), Product Manager
