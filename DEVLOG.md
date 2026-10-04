@@ -2290,3 +2290,21 @@ The app's own rule is that release notes and every feature claim get updated in 
 - A public account-deletion page went live. It covers in-app deletion, an email request for people who no longer have the app, and exactly what is and isn't deleted. Google Play requires this.
 - The Play Console setup began, with the Data safety form answered from the code and the privacy policy rather than from memory. One answer was caught and corrected before submission: all data is encrypted in transit.
 
+
+## Session — 2026-09-25/27 | One tagline everywhere; Android bugs found and fixed before launch
+
+### One public message
+
+The Play listing, feature graphic, both READMEs and the website had drifted into three different taglines, and the site's hidden meta descriptions didn't match its own headline. They now all use "Your trip, in one place." A single source-of-truth file now lists every public claim (tagline, pricing, platforms) and every surface that repeats it, and the project's process checks it whenever a feature merges, a build ships or any copy changes, not only at release time.
+
+### Bugs caught by testing on Android
+
+Running the release build on an Android emulator turned up real problems before any Android user saw them:
+- **Schengen tracker undercount.** It counted hotel nights only, so a 43-day trip across Schengen showed 14 of 90 days used. It now counts the full trip span, including entry and exit days. This bug affected iOS too.
+- **Hospital search on Android** tried to open Apple Maps and failed. It now opens Google Maps.
+- **Embassy filter.** Tapping a passport filter now opens the country card so the matching embassy contacts are visible. An automated UI test now covers this.
+- **Permissions.** Microphone and draw-over-other-apps permissions the app never uses are now blocked, so the store privacy answers match what the app actually requests.
+
+### Google Play
+
+Data safety, the content declarations, category and support contact are done, and the internal-testing tester list is set. Next: the first Android build uploaded to internal testing.
