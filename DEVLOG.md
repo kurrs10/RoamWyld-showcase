@@ -2308,3 +2308,21 @@ Running the release build on an Android emulator turned up real problems before 
 ### Google Play
 
 Data safety, the content declarations, category and support contact are done, and the internal-testing tester list is set. Next: the first Android build uploaded to internal testing.
+
+## Session — 2026-10-04 | Layover bugs found and fixed; simulator tests automated; privacy policy tightened; first Android build
+
+### Layovers that were silently missing
+Polishing the itinerary timeline turned up a live bug: a connection after an overnight (red-eye) flight never showed its layover. The app read "lands at 6:00 AM" as the same day the flight left. The first fix then broke two other real cases, and review caught both before anything shipped:
+- Flights across the date line land at an *earlier* clock time on the same calendar day (Tokyo 5 PM → Los Angeles 10 AM).
+- Connections through airports the app has no timezone data for were hidden.
+
+The final version uses each airport's timezone to work out when a flight really landed, and falls back to the old behavior when an airport's timezone is unknown. A connection of exactly 24 hours now counts as two separate trips rather than a layover, which matches how airlines define it.
+
+### Simulator tests that run themselves
+Timeline checks used to rely on driving native date pickers, which was flaky. Now a script creates a dedicated test trip with every scenario through the app's normal permission rules, runs the UI checks on the simulator, and deletes the trip afterwards. The scenarios are free-time gaps, tight connections, the 24-hour boundary, red-eye, date line, and round trips. The app's privacy and terms screens get the same treatment.
+
+### Privacy policy: matching what the app actually does
+A legal review checked every policy claim against the code. The policy now names every feature that sends data to the AI provider: Discover suggestions and Translate had never been listed. It lists exactly which trip fields go to transit directions and which never do (confirmation numbers, notes, passport details). It discloses PDF and photo import consistently in the app and on the website. The in-app contact is now a support address. Automated tests now fail if the app's policy and the website's drift apart.
+
+### First Android build
+The build pipeline was tightened first, so that local secrets and a stale native folder can't be included in what gets uploaded. Product and QA sign-offs then cleared the first Android production build for Google Play internal testing.
