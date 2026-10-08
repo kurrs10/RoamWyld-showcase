@@ -2343,3 +2343,16 @@ Two branches of privacy and database-permission fixes went through the full revi
 
 ### First Android device test
 The automated suite ran on Android for the first time against the real store build. The itinerary timeline passed every scenario. The privacy and terms screens didn't scroll on Android, while other sheets did, so that build stays in internal testing until a fix is confirmed on the next one.
+
+## Session (cont.) — 2026-10-08 | Privacy work merged; email forwarding tightened before launch
+
+The privacy and database-permission work from earlier in the week passed its last review rounds and is merged into the development branch. It will reach users with the next release.
+
+Bringing the upcoming email-forwarding feature up to date turned up a few things worth fixing before it ships:
+- It was keeping a short verbatim quote of each forwarded email. It now stores only the booking details.
+- Housekeeping that deletes old forwarding records now runs on a schedule, instead of only when a new email arrives.
+- Sender addresses and subject lines are erased after 30 days.
+- The "Add to Contacts" shortcut was dropped. Asking for contacts permission to save a single address wasn't worth it, so the screen now offers a simple Copy button.
+- The privacy policy now describes the feature in full, including the email provider's own 30-day copy, before the feature is switched on.
+
+Paused before the production database update and the next Android build. Those come next.
