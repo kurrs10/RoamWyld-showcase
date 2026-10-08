@@ -197,7 +197,7 @@ Travel agents build itineraries for clients and deliver them directly to travele
 
 | Feature | Timeline | Detail |
 |---------|----------|--------|
-| Android | **In progress** (updated 2026-10-04) | Organization Google Play account is live (no closed-testing gate), so the path is internal testing, then production. The Play Console listing, Data safety form and declarations are done, the internal-testing tester list is set, and the first production build passed product and QA sign-off and is building. Android launches free, with Gmail import hidden until it has its own OAuth setup. Next: internal testing on a real install, then production |
+| Android | **In progress** (updated 2026-10-08) | Organization Google Play account (no closed-testing gate), so the path is internal testing, then production. The first production build is in internal testing. Automated tests on it passed for the itinerary timeline but found that the privacy and terms screens don't scroll on Android. A fix is ready for the next build, and nothing is promoted until it's confirmed. Android launches free, with Gmail import hidden until it has its own OAuth setup |
 | Outlook import | 2027 | Gmail covers the core persona; Outlook targets enterprise users — post-traction |
 | Affiliate revenue | Ongoing | Airalo (eSIM), SafetyWing (insurance), Wise (currency), iVisa (visa assistance) |
 

@@ -2326,3 +2326,20 @@ A legal review checked every policy claim against the code. The policy now names
 
 ### First Android build
 The build pipeline was tightened first, so that local secrets and a stale native folder can't be included in what gets uploaded. Product and QA sign-offs then cleared the first Android production build for Google Play internal testing.
+
+## Session — 2026-10-05 to 10-08 | Privacy follow-through, a second review round, and the first Android device test
+
+### Reviews that earned their keep
+Two branches of privacy and database-permission fixes went through the full review gate (QA, code review, database, and GDPR), and the first round said no. QA showed that removing the check that stops email attachments from being downloaded left every test green, so the test proved nothing. The code review found that signed-in users could reset their own rate limits on two AI features. Both were fixed, and the tests were rewritten so they fail when the code is wrong. Every new test was checked by breaking the code on purpose and confirming the test catches it.
+
+### Privacy: say only what's true, and collect less
+- **Collect less:**
+  - Passport nationality no longer goes to analytics.
+  - The analytics tool now discards IP addresses.
+  - Sign-in security logs are deleted after 30 days.
+  - Old placeholder records from account deletions were removed.
+- **Server logs:** every server log line has to pass an allow-list, so nothing a user typed or imported can end up in a log.
+- **Public policy:** the website's privacy policy was corrected the same day on two points: what's stored about a travel companion (a display name you choose, no email address), and how crash reports are handled. Two sentences are held back until the code that makes them true is deployed.
+
+### First Android device test
+The automated suite ran on Android for the first time against the real store build. The itinerary timeline passed every scenario. The privacy and terms screens didn't scroll on Android, while other sheets did, so that build stays in internal testing until a fix is confirmed on the next one.
