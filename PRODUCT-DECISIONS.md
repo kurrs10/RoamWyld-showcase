@@ -194,3 +194,12 @@ After this runs: set `ALL_FREE = false`, configure RevenueCat offerings, submit 
 **Decision:** Every manual testing document is now written to state up front, explicitly, everything already confirmed by automated tests and live-verified runs — so a human pass only ever covers what genuinely requires one (real cross-account behavior, a visual confidence check, final submission steps), never re-litigating what's already proven.
 **Rejected:** Scattered, feature-by-feature manual test documents that don't distinguish "verified elsewhere" from "needs your eyes," implicitly asking the tester to re-check everything.
 **Why:** A founder's manual testing time is the scarcest resource in a one-person build process. Spending it re-confirming things automation already caught is a worse use of that time than spending it on the small number of things that structurally require a human — and it trains the habit of treating every test pass as a hunt for anything wrong, which is exhausting and doesn't scale. Making the automated coverage explicit and visible turns manual testing into a fast confidence check instead of an open-ended search.
+
+### Collect Less Instead of Disclosing More
+**Decision:** When a privacy review finds data the policy doesn't mention, the first choice is to stop collecting or keeping it, not to add a disclosure. Applied in October 2026: analytics IP addresses are now discarded, passport nationality was removed from analytics events, sign-in security logs are deleted after 30 days, and leftover placeholder records from account deletions were removed.
+**Rejected:** Keeping the data and adding a sentence to the privacy policy for each item.
+**Why:** Every disclosed item is a promise to maintain, a question a reviewer will ask, and data that can leak. None of these items was being used for a decision. The one real cost was losing country-level breakdowns in analytics, which nobody was using.
+
+### A Test Isn't Done Until Breaking the Code Fails It
+**Decision:** For any new test that guards a privacy or security behavior, the reviewer deliberately breaks the code it protects (removes the check, widens the permission, logs the forbidden value) and confirms the test goes red.
+**Why:** A review found that removing the very line that stops email attachments from being downloaded left all 1,100+ tests green. The test checked a helper function on its own, not the behavior users depend on. Mutation checks found several more tests like it that passed for the wrong reasons.
