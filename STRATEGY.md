@@ -41,7 +41,7 @@ Individually, partial versions exist (Rome2Rio for routing, Sherpa for visa info
 | AI itinerary planning | No | No | No | No | Yes |
 | Collaborative group planning | No | Yes (Pro) | Yes | No | Yes |
 | Web / desktop interface | No | No | Yes | Yes | Yes |
-| Android | No | No | Yes | Yes | No (in dev) |
+| Android | In Play review (Nov 2026) | No | Yes | Yes | No (in dev) |
 
 ### What Roam Wyld Wins On (No Competitor Matches)
 
@@ -117,7 +117,9 @@ Every account created on or before the cutoff (2026-08-31) is permanently grandf
 
 ### Pricing Strategy
 
-**Launch pricing (finalized 2026-08-31): $1.99/month · $9.99/year, 14-day free trial, no promo.**
+> **Revised 2026-10-20:** Pro launches annual-only at about $20/yr, built on non-AI features (PDF itinerary export, trip cover art, a trip recap card), so the paid tier doesn't carry a per-use AI cost. Everyone who has an account on Pro launch day keeps Pro free, forever. The August plan below is kept for the record of how the decision evolved.
+
+**Launch pricing (finalized 2026-08-31, since revised): $1.99/month · $9.99/year, 14-day free trial, no promo.**
 
 The category runs $39.99–$59.99/yr (Wanderlog $39.99, TripIt Pro $48.99, Tripsy Pro $59.99). Roam Wyld launches at roughly a fifth of that — a deliberate bet that at a near-impulse price the goal is downloads, reviews, and word of mouth, not early revenue. The paid tier is aligned to real per-use cost (the Claude API calls behind import and AI features), not to friction, so trip count and other zero-marginal-cost features stay free.
 

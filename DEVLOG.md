@@ -2356,3 +2356,26 @@ Bringing the upcoming email-forwarding feature up to date turned up a few things
 - The privacy policy now describes the feature in full, including the email provider's own 30-day copy, before the feature is switched on.
 
 Paused before the production database update and the next Android build. Those come next.
+
+## Sessions — 2026-10-11 to 11-01 | Production backend, a security audit, and Android to production review
+
+### Running the business on a few hours a week
+The product now runs against two written goals: profitable in 2027, and an asset another company would want. Every feature has to show market or usage evidence before it's scoped, and a monthly market scan re-ranks the backlog. Work that only the founder can do (store consoles, logins, decisions) sits in one queue with a time estimate and a recommended answer, so her time goes on yes/no calls rather than research.
+
+### Production backend caught up, safely
+- The production database was brought up to date ahead of a platform deadline that would have cut off access to new tables.
+- CI now replays every pending migration against a snapshot of the production schema before anything ships. It caught a function-ordering bug that had already failed once in production.
+- CI also fails the build if any database function is callable by anonymous users.
+- Nightly encrypted backups now run under a read-only role, with an alarm if a run is missed. The privacy policy says so.
+
+### A four-way audit, and a fix that removed a whole class of risk
+Security, database, data-governance and privacy reviews ran in parallel. The most serious finding: a permissive database policy, added by hand in a dashboard, let anyone who knew a trip ID add bookings to it. It was closed the same day. The bigger structural fix: flight and hotel checks no longer call outside services straight from the app. They go through the backend with a per-user daily limit, so the API keys are no longer in the app at all. The AI features got hourly and daily limits too.
+
+### Android: find the root cause, don't guess
+The first Android fix for screens that wouldn't scroll was a guess, and it didn't work. Measuring showed that on Android every full-screen pop-up grew to fit its content (one was over 6,000 points tall), so nothing could scroll. One shared sizing rule now applies to all 16 pop-ups. A test scans the code and fails if a new one is added without it. A final emulator pass found two small layout issues, and the call was to fix them before launch rather than after. The production build passed product-owner and QA sign-off plus an emulator check, and went to Google's review on November 1.
+
+### Pricing, decided with data
+The second market scan led to a revised Pro plan. It's annual-only, at about $20/yr, and built on features that cost nothing per use (PDF export, trip cover art, a trip recap card) instead of unlimited AI. Everyone with an account at launch keeps Pro free.
+
+### Keeping the signature feature true
+Entry requirements are the feature competitors can't match offline, so they have to be right. The November refresh added the EU's Entry/Exit System, which has fingerprinted non-EU visitors since April. It added an honest note that ETIAS is not required yet and has no confirmed date, plus a warning about paid ETIAS sites. It also brought in the current UK travel-authorisation fee, and fixed Ireland wrongly showing a 90-day limit for UK and EU passports.
