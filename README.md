@@ -3,7 +3,7 @@
 
 **Your trip, in one place.**
 
-> Live on the App Store — July 2026  
+> Live on the App Store (July 2026) and Google Play (November 2026)  
 > Built by [Kirsten Evans](https://www.kirstenmoberly.com), Product Manager
 
 ---
@@ -20,7 +20,7 @@ Roam Wyld is the app that should have existed the whole time.
 
 ## Solution
 
-A single iOS app that:
+A single mobile app (iPhone and Android) that:
 - **Imports** bookings from Gmail, PDF uploads, or manual entry — and validates them against real flight and hotel data
 - **Guides** travelers step-by-step through every transit connection on their itinerary, with specific train lines, platform numbers, and ticket costs
 - **Informs** travelers of entry requirements, visa rules, and Schengen day limits — per passport, for mixed-nationality groups
@@ -81,7 +81,7 @@ The four-feature combination — validation + entry requirements + offline trans
 
 | Layer | Technology |
 |-------|-----------|
-| Mobile | React Native + Expo (iOS) |
+| Mobile | React Native + Expo (iOS + Android) |
 | Backend | Supabase (Postgres + Edge Functions + Auth) |
 | AI | Claude API (Anthropic) — transit directions |
 | Flight validation | AviationStack API |
